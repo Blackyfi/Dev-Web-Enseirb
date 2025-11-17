@@ -1,7 +1,4 @@
 // Middleware to verify JWT tokens and protect routes
-const express = require('express');
-const router = express.Router();
-const db = require('../database/db');
 const { verifyToken } = require('../utils/jwt');
 
 // Middleware d'authentification
