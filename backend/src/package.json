@@ -1,0 +1,15 @@
+{
+  "name": "seenflix-backend",
+  "version": "1.0.0",
+  "description": "Backend API pour SeenFlix - Gestion de films et séries",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "echo \"Tests à implémenter\" && exit 0"
+  },
+  "keywords": ["seenflix", "movies", "api", "express"],
+  "author": "Votre nom",
+  "license": "ISC"
+}
