@@ -67,7 +67,16 @@ router.post("/me/favorites", authMiddleware, async (req, res) => {
                     console.error('Error while creating favorite:', insertErr);
                     return res.status(500).json({ error: 'Database error while creating favorite' });
                 }
-                return res.status(201).json("Created Favorite");
+                const createdFavorite = {
+                    id: insertResults.insertId,
+                    user_id: userId,
+                    film_id: film_id,
+                    type: type.toLowerCase(),
+                    rating: rating || null,
+                    comment: comment || null,
+                    created_at: new Date().toISOString()
+                };
+                return res.status(201).json(createdFavorite);
             });
         });
     } catch (error) {
