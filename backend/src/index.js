@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
+import authRoutes from './routes/auth.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -27,6 +28,9 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Routes
+app.use('/auth', authRoutes);
 
 // Middleware de gestion d'erreurs (à développer plus tard)
 app.use((err, req, res, next) => {

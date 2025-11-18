@@ -1,0 +1,37 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test@example.com",
+    "password": "testpassword123"
+  }
+}
+
+tests {
+  test("Status code is 201 or 400", function() {
+    const status = res.getStatus();
+    expect([201, 400]).to.include(status);
+  });
+
+  test("Response has message", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+
+  test("Success response has correct message", function() {
+    if (res.getStatus() === 201) {
+      const data = res.getBody();
+      expect(data.message).to.equal('User created successfully');
+    }
+  });
+}

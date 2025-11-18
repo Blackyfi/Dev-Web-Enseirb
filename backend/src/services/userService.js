@@ -3,18 +3,18 @@
 import * as db from '../database/db.js';
 import * as passwordHash from '../utils/passwordHash.js';
 
-// Authenticate user with username and password
-export async function authenticateUser(username, password) {
-  const user = await db.getUserByUsername(username);
-  if (user && await passwordHash.verifyPassword(password, user.password)) {
+// Authenticate user with email and password
+export async function authenticateUser(email, password) {
+  const user = await db.getUserByEmail(email);
+  if (user && await passwordHash.verifyPassword(password, user.password_hash)) {
     return user;
   }
   return null;
 }
 
 // Create a new user
-export async function createUser(username, password) {
+export async function createUser(email, password) {
   const hashedPassword = await passwordHash.hashPassword(password);
-  const newUser = await db.insertUser({ username, password: hashedPassword });
+  const newUser = await db.insertUser({ email, password_hash: hashedPassword });
   return newUser;
 }
