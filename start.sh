@@ -24,7 +24,8 @@ case "$1" in
 
     # Démarrer le backend en local
     echo "🔧 Démarrage du backend..."
-    cd backend/src && npm run dev
+    cd backend/src && npm install
+    npm run dev
     ;;
 
   prod)
