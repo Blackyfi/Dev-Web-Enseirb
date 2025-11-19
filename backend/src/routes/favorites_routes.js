@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import {db} from "../database/db.js";
 import {authMiddleware} from "../middleware/authMiddleware.js";
-import {BadRequestError,UnauthorizedError,InternalServerError} from '../middleware/errorHandlingExpress.js';
+import {BadRequestError,UnauthorizedError,InternalServerError,NotFoundError} from '../middleware/errorHandlingExpress.js';
 import {validateFavoriteData} from '../middleware/validateRequest.js';
 
 // GET /me/favorites - Get all favorites of a user
@@ -78,6 +78,42 @@ router.post("/me/favorites", authMiddleware, async (req, res, next) => {
                     created_at: new Date().toISOString()
                 };
                 return res.status(201).json(createdFavorite);
+            });
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.delete("/me/favorites/:id", authMiddleware, async (req, res, next) => {
+    try {
+        console.log("DELETE /me/favorites/:id - Delete a favorite");
+        const userId = req.user.id;
+        if (!userId) throw new UnauthorizedError("Need to be logged in");
+        const favoriteId = req.params.id;
+        if (!favoriteId || isNaN(parseInt(favoriteId))) {
+            throw new BadRequestError("ID de favori invalide");
+        }
+        const selectQuery = 'SELECT id, user_id FROM seenflix.favorites WHERE id = ?';
+        db.query(selectQuery, [favoriteId], (selectErr, selectResults) => {
+            if (selectErr) {
+                console.error('Error while fetching favorite:', selectErr);
+                return next(new InternalServerError('Erreur lors de la récupération du favori'));
+            }
+            if (!selectResults || selectResults.length === 0) {
+                return next(new NotFoundError("Favori non trouvé"));
+            }
+            const favorite = selectResults[0];
+            if (favorite.user_id !== userId) {
+                return next(new UnauthorizedError("Vous n'avez pas accès à ce favori"));
+            }
+            const deleteQuery = 'DELETE FROM seenflix.favorites WHERE id = ?';
+            db.query(deleteQuery, [favoriteId], (deleteErr) => {
+                if (deleteErr) {
+                    console.error('Error while deleting favorite:', deleteErr);
+                    return next(new InternalServerError('Erreur lors de la suppression du favori'));
+                }
+                return res.status(204).send();
             });
         });
     } catch (error) {
