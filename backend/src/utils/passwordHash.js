@@ -1,9 +1,8 @@
 import bcrypt from 'bcrypt';
-
-const saltRounds = 10;
+import config from '../config/auth.config.js';
 
 export async function hashPassword(plainPassword) {
-  const hash = await bcrypt.hash(plainPassword, saltRounds);
+  const hash = await bcrypt.hash(plainPassword, config.saltRounds);
   return hash;
 }
 

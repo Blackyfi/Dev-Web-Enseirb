@@ -1,17 +1,16 @@
 // jwt creation and verification utilities (jsonwebtoken)
 import jwt from 'jsonwebtoken';
-
-const SECRET_KEY = process.env.JWT_SECRET || 'your-secret-key';
+import config from '../config/auth.config.js';
 
 // Create a JWT token
-export function createToken(payload, expiresIn = '1h') {
-  return jwt.sign(payload, SECRET_KEY, { expiresIn });
+export function createToken(payload) {
+  return jwt.sign(payload, config.secret, { expiresIn: config.jwtExpiration });
 }
 
 // Verify a JWT token
 export function verifyToken(token) {
   try {
-    return jwt.verify(token, SECRET_KEY);
+    return jwt.verify(token, config.secret);
   } catch (err) {
     return null;
   }

@@ -3,7 +3,3 @@
   "ext": "js,json",
   "ignore": ["tests/*", "node_modules/*"]
 }
-
-
-
-

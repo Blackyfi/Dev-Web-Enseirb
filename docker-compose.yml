@@ -1,5 +1,5 @@
 services:
-  db:
+  database:
     image: mysql:8.0
     restart: always
     networks:
@@ -28,18 +28,23 @@ services:
     networks:
       - seenflix-network
     environment:
-      NODE_ENV: dev
-      DB_HOST: db
-      DB_PORT: 3306
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
-      PORT: ${PORT}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      BACKEND_PORT: ${BACKEND_PORT}
+      NODE_ENV: ${NODE_ENV}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      TMDB_BASE_URL: ${TMDB_BASE_URL}
     ports:
-      - "${PORT}:3000"
+      - "${APP_PORT}:${BACKEND_PORT}"
     depends_on:
-      db:
+      database:
         condition: service_healthy
 
 
