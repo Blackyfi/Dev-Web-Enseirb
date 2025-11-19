@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import {db} from "../database/db.js";
+import db from "../database/db.js";
 import {authMiddleware} from "../middleware/authMiddleware.js";
 import {BadRequestError,UnauthorizedError,InternalServerError,NotFoundError} from '../middleware/errorHandlingExpress.js';
 import {validateFavoriteData} from '../middleware/validateRequest.js';
@@ -121,4 +121,4 @@ router.delete("/favorites/:id", authMiddleware, async (req, res, next) => {
     }
 });
 
-module.exports = router;
+export default router;
