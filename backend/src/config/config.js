@@ -24,16 +24,14 @@ export default {
   refreshSecret: process.env.JWT_REFRESH_SECRET,
 
   /**
-   * La durée de vie d'un token d'accès.
-   * Exemples : "15m", "1h", "1d"
+   * La durée de vie d'un token d'accès (en secondes).
    */
-  jwtExpiration: process.env.JWT_ACCESS_EXPIRATION,
+  jwtExpiration: parseInt(process.env.JWT_ACCESS_EXPIRATION) || 3600,
 
   /**
-   * La durée de vie d'un token de refresh.
-   * Exemples : "7d", "30d"
+   * La durée de vie d'un token de refresh (en secondes).
    */
-  jwtRefreshExpiration: process.env.JWT_REFRESH_EXPIRATION,
+  jwtRefreshExpiration: parseInt(process.env.JWT_REFRESH_EXPIRATION) || 604800,
 
   /**
    * Le "coût" du hachage pour bcrypt.

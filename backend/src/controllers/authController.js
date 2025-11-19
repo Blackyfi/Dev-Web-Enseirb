@@ -3,13 +3,18 @@ import * as userService from '../services/userService.js';
 
 // User login
 export async function login(req, res) {
-  const { email, password } = req.body;
-  const user = await userService.authenticateUser(email, password);
-  if (user) {
-    const token = jwtutil.createToken({ id: user.id, email: user.email });
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
+  try {
+    const { email, password } = req.body;
+    const user = await userService.authenticateUser(email, password);
+    if (user) {
+      const token = jwtutil.createToken({ id: user.id, email: user.email });
+      res.json({ token });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 }
 
