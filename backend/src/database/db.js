@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-const pool = mysql.createPool({
+const db = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
@@ -25,7 +25,7 @@ const pool = mysql.createPool({
 });
 
 // Test connection
-pool.getConnection()
+db.getConnection()
   .then(connection => {
     console.log("Database connected!");
     connection.release();
@@ -35,4 +35,4 @@ pool.getConnection()
   });
 
 
-export default pool;
+export default db;

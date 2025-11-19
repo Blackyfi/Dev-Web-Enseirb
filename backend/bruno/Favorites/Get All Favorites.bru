@@ -1,0 +1,62 @@
+meta {
+  name: Get All Favorites
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/me/favorites
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("Status code is 200 or 401", function() {
+    const status = res.getStatus();
+    expect([200, 401]).to.include(status);
+  });
+
+  test("Success response is an array", function() {
+    if (res.getStatus() === 200) {
+      const data = res.getBody();
+      expect(data).to.be.an('array');
+    }
+  });
+
+  test("Favorites have required fields", function() {
+    if (res.getStatus() === 200) {
+      const data = res.getBody();
+      if (data.length > 0) {
+        const favorite = data[0];
+        expect(favorite).to.have.property('id');
+        expect(favorite).to.have.property('film_id');
+        expect(favorite).to.have.property('type');
+        expect(favorite).to.have.property('created_at');
+      }
+    }
+  });
+
+  test("Favorites are ordered by created_at DESC", function() {
+    if (res.getStatus() === 200) {
+      const data = res.getBody();
+      if (data.length > 1) {
+        for (let i = 0; i < data.length - 1; i++) {
+          const current = new Date(data[i].created_at);
+          const next = new Date(data[i + 1].created_at);
+          expect(current >= next).to.be.true;
+        }
+      }
+    }
+  });
+
+  test("Unauthorized without token", function() {
+    if (res.getStatus() === 401) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+    }
+  });
+}
