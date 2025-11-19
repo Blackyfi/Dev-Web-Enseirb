@@ -1,0 +1,49 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/refresh-token
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{authToken}}"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 200) {
+    const data = res.getBody();
+    if (data.token) {
+      bru.setEnvVar("authToken", data.token);
+    }
+  }
+}
+
+tests {
+  test("Status code is 200 or 401", function() {
+    const status = res.getStatus();
+    expect([200, 401]).to.include(status);
+  });
+
+  test("Success response has new token", function() {
+    if (res.getStatus() === 200) {
+      const data = res.getBody();
+      expect(data).to.have.property('token');
+      expect(data.token).to.be.a('string');
+    }
+  });
+
+  test("Invalid token returns 401", function() {
+    if (res.getStatus() === 401) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+      expect(data.message).to.equal('Invalid token');
+    }
+  });
+}

@@ -1,7 +1,8 @@
 // Authentication routes (login, register, logout, refresh token)
-const express = require('express');
+import express from 'express';
+import * as authController from '../controllers/authController.js';
+
 const router = express.Router();
-const authController = require('../controllers/authController');
 
 // User login
 router.post('/login', authController.login);
@@ -15,4 +16,4 @@ router.post('/logout', authController.logout);
 // Token refresh
 router.post('/refresh-token', authController.refreshToken);
 
-module.exports = router;
+export default router;

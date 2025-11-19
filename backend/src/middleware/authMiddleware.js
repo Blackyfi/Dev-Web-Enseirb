@@ -1,8 +1,8 @@
 // Middleware to verify JWT tokens and protect routes
-import { verifyToken } from "../utils/jwt";
+import { verifyToken } from '../utils/jwt.js';
 
 // Middleware d'authentification
-export const authMiddleware = async (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

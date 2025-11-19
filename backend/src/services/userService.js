@@ -1,25 +1,20 @@
 // User service handling user data and operations
 
-const db = require('../database/db');
-const passwordHash = require('../utils/passwordHash');
+import * as userDb from '../database/user.js';
+import * as passwordHash from '../utils/passwordHash.js';
 
-// Authenticate user with username and password
-async function authenticateUser(username, password) {
-  const user = await db.getUserByUsername(username);
-  if (user && passwordHash.verifyPassword(password, user.password)) {
+// Authenticate user with email and password
+export async function authenticateUser(email, password) {
+  const user = await userDb.getUserByEmail(email);
+  if (user && await passwordHash.verifyPassword(password, user.password_hash)) {
     return user;
   }
   return null;
 }
 
 // Create a new user
-async function createUser(username, password) {
+export async function createUser(email, password) {
   const hashedPassword = await passwordHash.hashPassword(password);
-  const newUser = await db.insertUser({ username, password: hashedPassword });
+  const newUser = await userDb.insertUser({ email, password_hash: hashedPassword });
   return newUser;
 }
-
-module.exports = {
-  authenticateUser,
-  createUser,
-};

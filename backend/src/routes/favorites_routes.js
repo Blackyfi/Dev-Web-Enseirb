@@ -13,7 +13,7 @@ router.get("/me/favorites", authMiddleware, async (req, res, next) => {
         const userId = req.user.id;
         if (!userId) throw new UnauthorizedError("Need to be logged in");
         const query = 'SELECT id, film_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
-        await db.query(query, [userId], (err, results) => {
+        await pool.query(query, [userId], (err, results) => {
             if (err) {
                 console.error('Error while getting current user favorites:', err);
                 return next(new InternalServerError('Erreur lors de la récupération des favoris'));
@@ -41,7 +41,7 @@ router.post("/me/favorites", authMiddleware, async (req, res, next) => {
         // CHECK DUPLICATE
         // Check if favorite already exists (no duplicate userId + film_id + type)
         const checkQuery = 'SELECT id FROM seenflix.favorites WHERE user_id = ? AND film_id = ? AND type = ?';
-        db.query(checkQuery, [userId, film_id, type.toLowerCase()], (checkErr, checkResults) => {
+        pool.query(checkQuery, [userId, film_id, type.toLowerCase()], (checkErr, checkResults) => {
             if (checkErr) {
                 console.error('Error while checking for duplicate favorite:', checkErr);
                 return next(new InternalServerError('Erreur lors de la vérification des doublons'));
@@ -63,7 +63,7 @@ router.post("/me/favorites", authMiddleware, async (req, res, next) => {
                 rating || null,
                 comment || null
             ];
-            db.query(insertQuery, insertParams, (insertErr, insertResults) => {
+            pool.query(insertQuery, insertParams, (insertErr, insertResults) => {
                 if (insertErr) {
                     console.error('Error while creating favorite:', insertErr);
                     return next(new InternalServerError('Erreur lors de la création du favori'));
