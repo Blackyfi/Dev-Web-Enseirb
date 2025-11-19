@@ -1,25 +1,17 @@
-const db = require('./db');
+import pool from './db.js';
 
-// Get user by username
-async function getUserByUsername(username) {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM users WHERE username = ?';
-    db.query(query, [username], (err, results) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(results[0]);
-    });
-  });
+// Get user by email
+export async function getUserByEmail(email) {
+  const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+  return rows[0];
 }
 
-
-
-
-
-
-
-
-module.exports = {
-  getUserByUsername,
-};
+// Insert new user
+export async function insertUser(userData) {
+  const { email, password_hash } = userData;
+  const [result] = await pool.execute(
+    'INSERT INTO users (email, password_hash) VALUES (?, ?)',
+    [email, password_hash]
+  );
+  return { id: result.insertId, email };
+}

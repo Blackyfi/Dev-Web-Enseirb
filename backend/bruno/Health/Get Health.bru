@@ -1,0 +1,28 @@
+meta {
+  name: Get Health
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response has status OK", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('status');
+    expect(data.status).to.equal('OK');
+  });
+
+  test("Response has timestamp", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('timestamp');
+  });
+}

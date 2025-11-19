@@ -1,0 +1,30 @@
+meta {
+  name: Get Movie By name
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/movies/search?name={{movieName}}
+  body: none
+  auth: none
+}
+
+params:query {
+  name: {{movieName}}
+}
+
+vars:pre-request {
+  movieName: Inception
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains movies array", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('results');
+  });
+}

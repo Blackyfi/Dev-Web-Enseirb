@@ -79,7 +79,7 @@ function validateFavoriteData(data) {
     };
 }
 
-module.exports = {
+export {
     validatefilm_id,
     validateType,
     validateRating,
