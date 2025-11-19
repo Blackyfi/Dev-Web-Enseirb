@@ -14,21 +14,25 @@ git clone <repo-url>
 cd Dev-Web-Enseirb
 ```
 
-### 2. Setup environment variables
 
-Copy the example file and configure your variables:
+### 2. Run the app
+
+#### Production mode
+
+Copy the `.env.example` file into `.env` and add your variables. 
+And then run:
+
 
 ```bash
-cp .env.example .env.local
+./start.sh prod
 ```
 
-Edit `.env.local` with your values:
-- `JWT_SECRET` - Your secret key for JWT tokens
-- `TMDB_API_KEY` - Your TMDB API key
-
-### 3. Run the application
+This will build and run all services via Docker.
 
 #### Development mode (recommended for local work)
+
+Copy the `.env.example` file into `.env.local` and add your development variables. 
+And then run:
 
 ```bash
 ./start.sh dev
@@ -37,14 +41,6 @@ Edit `.env.local` with your values:
 This will:
 - Start the database via Docker
 - Run the backend locally with hot reload
-
-#### Production mode
-
-```bash
-./start.sh prod
-```
-
-This will build and run all services via Docker.
 
 ### Other commands
 
