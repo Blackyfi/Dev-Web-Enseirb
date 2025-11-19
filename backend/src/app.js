@@ -1,16 +1,6 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-let LOG_LEVEL;
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
-  LOG_LEVEL = process.env.LOG_LEVEL || 'dev';
-}
+const LOG_LEVEL = process.env.LOG_LEVEL || 'dev';
 
 import cors from 'cors';
 import helmet from 'helmet';

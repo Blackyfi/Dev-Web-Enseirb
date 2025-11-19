@@ -1,6 +1,6 @@
 // jwt creation and verification utilities (jsonwebtoken)
 import jwt from 'jsonwebtoken';
-import config from '../config/auth.config.js';
+import config from '../config/config.js';
 
 // Create a JWT token
 export function createToken(payload) {

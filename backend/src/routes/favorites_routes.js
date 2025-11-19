@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import {db} from "../database/db.js";
+import db from "../database/db.js";
 import {authMiddleware} from "../middleware/authMiddleware.js";
 import {BadRequestError,UnauthorizedError,InternalServerError,NotFoundError} from '../middleware/errorHandlingExpress.js';
 import {validateFavoriteData} from '../middleware/validateRequest.js';
@@ -11,9 +11,10 @@ router.get("/favorites", authMiddleware, async (req, res, next) => {
     try {
         console.log("GET /favorites - Get all favorites of a user");
         const userId = req.user.id;
+        console.log("User ID from token:", userId);
         if (!userId) throw new UnauthorizedError("Need to be logged in");
-        const query = 'SELECT id, film_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
-        await pool.query(query, [userId], (err, results) => {
+        const query = 'SELECT id, movie_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
+        await db.query(query, [userId], (err, results) => {
             if (err) {
                 console.error('Error while getting current user favorites:', err);
                 return next(new InternalServerError('Erreur lors de la récupération des favoris'));
@@ -31,17 +32,17 @@ router.post("/favorites", authMiddleware, async (req, res, next) => {
         // GET RELEVANT DATA FROM PAGE
         const userId = req.user.id;
         if (!userId) throw new UnauthorizedError("Need to be logged in");
-        const { film_id, type, rating, comment } = req.body;
+        const { movie_id, type, rating, comment } = req.body;
         // VALIDATION
         // Validate input data
-        const validation = validateFavoriteData({ film_id, type, rating, comment });
+        const validation = validateFavoriteData({ movie_id, type, rating, comment });
         if (!validation.isValid) {
             throw new BadRequestError('Données d\'entrée invalides: ' + validation.errors.join(', '));
         }
         // CHECK DUPLICATE
-        // Check if favorite already exists (no duplicate userId + film_id + type)
-        const checkQuery = 'SELECT id FROM seenflix.favorites WHERE user_id = ? AND film_id = ? AND type = ?';
-        pool.query(checkQuery, [userId, film_id, type.toLowerCase()], (checkErr, checkResults) => {
+        // Check if favorite already exists (no duplicate userId + movie_id + type)
+        const checkQuery = 'SELECT id FROM seenflix.favorites WHERE user_id = ? AND movie_id = ? AND type = ?';
+        db.query(checkQuery, [userId, movie_id, type.toLowerCase()], (checkErr, checkResults) => {
             if (checkErr) {
                 console.error('Error while checking for duplicate favorite:', checkErr);
                 return next(new InternalServerError('Erreur lors de la vérification des doublons'));
@@ -53,17 +54,17 @@ router.post("/favorites", authMiddleware, async (req, res, next) => {
             }
             // MAKE AND FILL THE QUERY AND SEND IT
             const insertQuery = `
-                INSERT INTO seenflix.favorites (user_id, film_id, type, rating, comment, created_at)
+                INSERT INTO seenflix.favorites (user_id, movie_id, type, rating, comment, created_at)
                 VALUES (?, ?, ?, ?, ?, NOW())
             `;
             const insertParams = [
                 userId,
-                film_id,
+                movie_id,
                 type.toLowerCase(),
                 rating || null,
                 comment || null
             ];
-            pool.query(insertQuery, insertParams, (insertErr, insertResults) => {
+            db.query(insertQuery, insertParams, (insertErr, insertResults) => {
                 if (insertErr) {
                     console.error('Error while creating favorite:', insertErr);
                     return next(new InternalServerError('Erreur lors de la création du favori'));
@@ -71,7 +72,7 @@ router.post("/favorites", authMiddleware, async (req, res, next) => {
                 const createdFavorite = {
                     id: insertResults.insertId,
                     user_id: userId,
-                    film_id: film_id,
+                    movie_id: movie_id,
                     type: type.toLowerCase(),
                     rating: rating || null,
                     comment: comment || null,
@@ -121,4 +122,4 @@ router.delete("/favorites/:id", authMiddleware, async (req, res, next) => {
     }
 });
 
-module.exports = router;
+export default router;

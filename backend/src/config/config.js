@@ -1,5 +1,16 @@
 // Toutes les valeurs sont chargées depuis les variables d'environnement
 // Dev : .env.local | Prod : .env (via Docker)
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
+}
 
 export default {
   /**

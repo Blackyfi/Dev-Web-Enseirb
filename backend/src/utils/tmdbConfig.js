@@ -1,5 +1,6 @@
 // TMDB API configuration
 
+import '../config/config.js'; // Ensure env vars are loaded
 import XMLHttpRequest from 'xhr2';
 
 // Helper function to make TMDB API requests using XHR

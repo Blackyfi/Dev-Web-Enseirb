@@ -1,10 +1,10 @@
-function validatefilm_id(film_id) {
-    if (film_id === undefined || film_id === null) {
-        return { isValid: false, error: 'film_id is required' };
+function validatemovie_id(movie_id) {
+    if (movie_id === undefined || movie_id === null) {
+        return { isValid: false, error: 'movie_id is required' };
     }
-    const id = Number(film_id);
+    const id = Number(movie_id);
     if (!Number.isInteger(id) || id <= 0) {
-        return { isValid: false, error: 'film_id must be a positive integer' };
+        return { isValid: false, error: 'movie_id must be a positive integer' };
     }
     return { isValid: true, error: null };
 }
@@ -56,9 +56,9 @@ function validateComment(comment, maxLength = 1000) {
 function validateFavoriteData(data) {
     const errors = [];
     // Validate required fields
-    const film_idValidation = validatefilm_id(data.film_id);
-    if (!film_idValidation.isValid) {
-        errors.push(film_idValidation.error);
+    const movie_idValidation = validatemovie_id(data.movie_id);
+    if (!movie_idValidation.isValid) {
+        errors.push(movie_idValidation.error);
     }
     const typeValidation = validateType(data.type);
     if (!typeValidation.isValid) {
@@ -80,7 +80,7 @@ function validateFavoriteData(data) {
 }
 
 export {
-    validatefilm_id,
+    validatemovie_id,
     validateType,
     validateRating,
     validateComment,

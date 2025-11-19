@@ -2,10 +2,10 @@
 
 export const validateFavoriteData = (data) => {
     const errors = [];
-    if (!data.film_id) {
-        errors.push('(film_id) est requis');
-    } else if (typeof data.film_id !== 'number' || data.film_id <= 0) {
-        errors.push('(film_id) doit être un nombre positif');
+    if (!data.movie_id) {
+        errors.push('(movie_id) est requis');
+    } else if (typeof data.movie_id !== 'number' || data.movie_id <= 0) {
+        errors.push('(movie_id) doit être un nombre positif');
     }
     if (!data.type) {
         errors.push('(type) est requis');
