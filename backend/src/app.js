@@ -10,15 +10,13 @@ let LOG_LEVEL;
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
   LOG_LEVEL = process.env.LOG_LEVEL || 'dev';
-} else {
-  LOG_LEVEL = process.env.LOG_LEVEL || 'combined';
 }
 
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-const authRoutes = (await import('./routes/auth.js')).default;
-const moviesRoutes = (await import('./routes/movies.js')).default;
+import authRoutes from './routes/auth.js';
+import moviesRoutes from './routes/movies.js';
 
 const app = express();
 const BACKEND_PORT = process.env.BACKEND_PORT;
