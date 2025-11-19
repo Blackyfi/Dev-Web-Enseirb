@@ -29,10 +29,10 @@ services:
       - seenflix-network
     environment:
       DB_HOST: ${DB_HOST}
+      DB_NAME: ${MYSQL_DATABASE}
       DB_PORT: ${DB_PORT}
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
-      DB_NAME: ${MYSQL_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}

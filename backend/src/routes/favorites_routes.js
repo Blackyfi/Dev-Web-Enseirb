@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import pool from '../database/db.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { validateFavoriteData } from '../utils/inputValidation.js';
+
 const router = express.Router();
-const db = require('../database/db');
-import {authMiddleware} from "../middleware/authMiddleware.js"
-import {validateFavoriteData} from "../utils/inputValidation.js"
 
 // GET /me/favorites - Get all favorites of a user
 // Nota bene : Might need to cut it in multiple slices if too big and thus add a page number like github API in the returned data
@@ -11,7 +12,7 @@ router.get("/me/favorites", authMiddleware, async (req, res) => {
         console.log("GET /me/favorites - Get all favorites of a user");
         const userId = req.user.id;
         const query = 'SELECT id, film_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
-        await db.query(query, [userId], (err, results) => {
+        await pool.query(query, [userId], (err, results) => {
             if (err) {
                 console.error('Error while getting current user favorites:', err);
                 return res.status(500).json({ error: 'Error after query serveur /me/favorites' });
@@ -42,7 +43,7 @@ router.post("/me/favorites", authMiddleware, async (req, res) => {
         // CHECK DUPLICATE
         // Check if favorite already exists (no duplicate userId + film_id + type)
         const checkQuery = 'SELECT id FROM seenflix.favorites WHERE user_id = ? AND film_id = ? AND type = ?';
-        db.query(checkQuery, [userId, film_id, type.toLowerCase()], (checkErr, checkResults) => {
+        pool.query(checkQuery, [userId, film_id, type.toLowerCase()], (checkErr, checkResults) => {
             if (checkErr) {
                 console.error('Error while checking for duplicate favorite:', checkErr);
                 return res.status(500).json({ error: 'Database error while checking for duplicates' });
@@ -62,7 +63,7 @@ router.post("/me/favorites", authMiddleware, async (req, res) => {
                 rating || null,
                 comment || null
             ];
-            db.query(insertQuery, insertParams, (insertErr, insertResults) => {
+            pool.query(insertQuery, insertParams, (insertErr, insertResults) => {
                 if (insertErr) {
                     console.error('Error while creating favorite:', insertErr);
                     return res.status(500).json({ error: 'Database error while creating favorite' });
@@ -85,4 +86,4 @@ router.post("/me/favorites", authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

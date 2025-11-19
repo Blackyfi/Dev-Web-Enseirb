@@ -1,15 +1,20 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+}
+
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import authRoutes from './routes/auth.js';
-
-// Charger les variables d'environnement
-// En dev : charge .env | En prod : Docker injecte directement les variables
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: '../../.env.local' });
-}
+const authRoutes = (await import('./routes/auth.js')).default;
+const moviesRoutes = (await import('./routes/movies.js')).default;
 
 const app = express();
 const BACKEND_PORT = process.env.BACKEND_PORT;
@@ -37,6 +42,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/movies', moviesRoutes); 
 
 // Middleware de gestion d'erreurs
 app.use((err, req, res, next) => {

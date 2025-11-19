@@ -1,14 +1,24 @@
 // database connection setup using mysql
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+// Charger les variables d'environnement depuis le bon fichier
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
+} else {
+  dotenv.config();
+}
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "user",
-  password: process.env.DB_PASSWORD || "1234",
-  database: process.env.DB_NAME || "seenflix",
+  host: process.env.DB_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -24,19 +34,5 @@ pool.getConnection()
     console.error("Database connection error:", err);
   });
 
-// Helper functions
-export async function getUserByEmail(email) {
-  const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
-  return rows[0];
-}
-
-export async function insertUser(userData) {
-  const { email, password_hash } = userData;
-  const [result] = await pool.execute(
-    'INSERT INTO users (email, password_hash) VALUES (?, ?)',
-    [email, password_hash]
-  );
-  return { id: result.insertId, email };
-}
 
 export default pool;
