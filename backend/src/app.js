@@ -6,8 +6,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let LOG_LEVEL;
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+  LOG_LEVEL = process.env.LOG_LEVEL || 'dev';
+} else {
+  LOG_LEVEL = process.env.LOG_LEVEL || 'combined';
 }
 
 import cors from 'cors';
@@ -23,7 +27,7 @@ const BACKEND_PORT = process.env.BACKEND_PORT;
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(morgan(process.env.LOG_LEVEL));
+app.use(morgan(LOG_LEVEL));
   
 
 // Route de test

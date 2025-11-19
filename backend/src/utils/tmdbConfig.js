@@ -17,8 +17,6 @@ export function tmdbFetch(endpoint, params = {}) {
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url.toString());
-
-    // Utiliser Bearer token pour l'authentification TMDB v4
     xhr.setRequestHeader('Authorization', `Bearer ${TMDB_API_KEY}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
 

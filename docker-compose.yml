@@ -28,19 +28,21 @@ services:
     networks:
       - seenflix-network
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${MYSQL_DATABASE}
+      DB_HOST: database
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       DB_PORT: ${DB_PORT}
-      DB_USER: ${MYSQL_USER}
-      DB_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
       BACKEND_PORT: ${BACKEND_PORT}
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: production
       TMDB_API_KEY: ${TMDB_API_KEY}
       TMDB_BASE_URL: ${TMDB_BASE_URL}
+      LOG_LEVEL: combined
     ports:
       - "${APP_PORT}:${BACKEND_PORT}"
     depends_on:
