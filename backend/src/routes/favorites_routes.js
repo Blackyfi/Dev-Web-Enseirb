@@ -7,14 +7,14 @@ import {validateFavoriteData} from '../middleware/validateRequest.js';
 
 // GET /favorites - Get all favorites of a user
 // Nota bene : Might need to cut it in multiple slices if too big and thus add a page number like github API in the returned data
-router.get("/favorites", authMiddleware, async (req, res, next) => {
+router.get("/favorites", authMiddleware, (req, res, next) => {
     try {
         console.log("GET /favorites - Get all favorites of a user");
         const userId = req.user.id;
         console.log("User ID from token:", userId);
         if (!userId) throw new UnauthorizedError("Need to be logged in");
         const query = 'SELECT id, movie_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
-        await db.query(query, [userId], (err, results) => {
+        db.query(query, [userId], (err, results) => {
             if (err) {
                 console.error('Error while getting current user favorites:', err);
                 return next(new InternalServerError('Erreur lors de la récupération des favoris'));
@@ -26,7 +26,7 @@ router.get("/favorites", authMiddleware, async (req, res, next) => {
     }
 });
 
-router.post("/favorites", authMiddleware, async (req, res, next) => {
+router.post("/favorites", authMiddleware, (req, res, next) => {
     try {
         console.log("POST /favorites - Create a favorite for the user");
         // GET RELEVANT DATA FROM PAGE
@@ -86,7 +86,7 @@ router.post("/favorites", authMiddleware, async (req, res, next) => {
     }
 });
 
-router.delete("/favorites/:id", authMiddleware, async (req, res, next) => {
+router.delete("/favorites/:id", authMiddleware, (req, res, next) => {
     try {
         console.log("DELETE /favorites/:id - Delete a favorite");
         const userId = req.user.id;

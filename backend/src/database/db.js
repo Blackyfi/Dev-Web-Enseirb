@@ -1,5 +1,5 @@
 // database connection setup using mysql
-import mysql from 'mysql2/promise';
+import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
