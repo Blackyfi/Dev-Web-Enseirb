@@ -16,7 +16,7 @@ auth:bearer {
 
 body:json {
   {
-    "film_id": 550,
+    "movie_id": 550,
     "type": "movie",
     "rating": 9,
     "comment": "One of my favorite movies!"
@@ -43,10 +43,10 @@ tests {
       const data = res.getBody();
       expect(data).to.have.property('id');
       expect(data).to.have.property('user_id');
-      expect(data).to.have.property('film_id');
+      expect(data).to.have.property('movie_id');
       expect(data).to.have.property('type');
       expect(data).to.have.property('created_at');
-      expect(data.film_id).to.equal(550);
+      expect(data.movie_id).to.equal(550);
       expect(data.type).to.equal('movie');
     }
   });
