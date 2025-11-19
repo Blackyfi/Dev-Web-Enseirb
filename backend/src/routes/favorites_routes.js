@@ -5,11 +5,11 @@ import {authMiddleware} from "../middleware/authMiddleware.js";
 import {BadRequestError,UnauthorizedError,InternalServerError,NotFoundError} from '../middleware/errorHandlingExpress.js';
 import {validateFavoriteData} from '../middleware/validateRequest.js';
 
-// GET /me/favorites - Get all favorites of a user
+// GET /favorites - Get all favorites of a user
 // Nota bene : Might need to cut it in multiple slices if too big and thus add a page number like github API in the returned data
-router.get("/me/favorites", authMiddleware, async (req, res, next) => {
+router.get("/favorites", authMiddleware, async (req, res, next) => {
     try {
-        console.log("GET /me/favorites - Get all favorites of a user");
+        console.log("GET /favorites - Get all favorites of a user");
         const userId = req.user.id;
         if (!userId) throw new UnauthorizedError("Need to be logged in");
         const query = 'SELECT id, film_id, type, created_at FROM seenflix.favorites WHERE user_id = ? ORDER BY created_at DESC'; // The movies should appear by descending order
@@ -25,9 +25,9 @@ router.get("/me/favorites", authMiddleware, async (req, res, next) => {
     }
 });
 
-router.post("/me/favorites", authMiddleware, async (req, res, next) => {
+router.post("/favorites", authMiddleware, async (req, res, next) => {
     try {
-        console.log("POST /me/favorites - Create a favorite for the user");
+        console.log("POST /favorites - Create a favorite for the user");
         // GET RELEVANT DATA FROM PAGE
         const userId = req.user.id;
         if (!userId) throw new UnauthorizedError("Need to be logged in");
@@ -85,9 +85,9 @@ router.post("/me/favorites", authMiddleware, async (req, res, next) => {
     }
 });
 
-router.delete("/me/favorites/:id", authMiddleware, async (req, res, next) => {
+router.delete("/favorites/:id", authMiddleware, async (req, res, next) => {
     try {
-        console.log("DELETE /me/favorites/:id - Delete a favorite");
+        console.log("DELETE /favorites/:id - Delete a favorite");
         const userId = req.user.id;
         if (!userId) throw new UnauthorizedError("Need to be logged in");
         const favoriteId = req.params.id;

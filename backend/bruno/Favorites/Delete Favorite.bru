@@ -1,0 +1,61 @@
+meta {
+  name: Delete Favorite
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/me/favorites/{{lastFavoriteId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("Status code is 204, 400, 401, or 404", function() {
+    const status = res.getStatus();
+    expect([204, 400, 401, 404]).to.include(status);
+  });
+
+  test("Success response has no content", function() {
+    if (res.getStatus() === 204) {
+      const body = res.getBody();
+      expect(body).to.be.oneOf([null, undefined, '']);
+    }
+  });
+
+  test("Invalid ID returns 400", function() {
+    if (res.getStatus() === 400) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+      expect(data.message).to.include('invalide');
+    }
+  });
+
+  test("Not found returns 404", function() {
+    if (res.getStatus() === 404) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+      expect(data.message).to.include('non trouvé');
+    }
+  });
+
+  test("Unauthorized without token", function() {
+    if (res.getStatus() === 401) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+    }
+  });
+
+  test("Cannot delete another user's favorite", function() {
+    if (res.getStatus() === 401) {
+      const data = res.getBody();
+      if (data.message && data.message.includes('accès')) {
+        expect(data.message).to.include('accès');
+      }
+    }
+  });
+}

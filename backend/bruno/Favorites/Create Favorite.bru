@@ -1,0 +1,90 @@
+meta {
+  name: Create Favorite
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/me/favorites
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "film_id": 550,
+    "type": "movie",
+    "rating": 9,
+    "comment": "One of my favorite movies!"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    const data = res.getBody();
+    if (data.id) {
+      bru.setEnvVar("lastFavoriteId", data.id);
+    }
+  }
+}
+
+tests {
+  test("Status code is 201, 400, 401, or 409", function() {
+    const status = res.getStatus();
+    expect([201, 400, 401, 409]).to.include(status);
+  });
+
+  test("Success response has required fields", function() {
+    if (res.getStatus() === 201) {
+      const data = res.getBody();
+      expect(data).to.have.property('id');
+      expect(data).to.have.property('user_id');
+      expect(data).to.have.property('film_id');
+      expect(data).to.have.property('type');
+      expect(data).to.have.property('created_at');
+      expect(data.film_id).to.equal(550);
+      expect(data.type).to.equal('movie');
+    }
+  });
+
+  test("Type is lowercase", function() {
+    if (res.getStatus() === 201) {
+      const data = res.getBody();
+      expect(data.type).to.equal(data.type.toLowerCase());
+    }
+  });
+
+  test("Rating and comment are optional", function() {
+    if (res.getStatus() === 201) {
+      const data = res.getBody();
+      expect(data).to.have.property('rating');
+      expect(data).to.have.property('comment');
+    }
+  });
+
+  test("Duplicate favorite returns 409", function() {
+    if (res.getStatus() === 409) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+      expect(data.message).to.include('existe déjà');
+    }
+  });
+
+  test("Invalid data returns 400", function() {
+    if (res.getStatus() === 400) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+    }
+  });
+
+  test("Unauthorized without token", function() {
+    if (res.getStatus() === 401) {
+      const data = res.getBody();
+      expect(data).to.have.property('message');
+    }
+  });
+}
