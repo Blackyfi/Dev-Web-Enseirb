@@ -12,9 +12,10 @@ post {
 
 body:json {
   {
-    "email": "test@example.com",
+    "email": "coucou@test.com",
     "password": "testpassword123"
   }
+  
 }
 
 tests {
@@ -22,12 +23,12 @@ tests {
     const status = res.getStatus();
     expect([201, 400]).to.include(status);
   });
-
+  
   test("Response has message", function() {
     const data = res.getBody();
     expect(data).to.have.property('message');
   });
-
+  
   test("Success response has correct message", function() {
     if (res.getStatus() === 201) {
       const data = res.getBody();
