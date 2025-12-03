@@ -1,8 +1,9 @@
 import * as jwtutil from '../utils/jwt.js';
 import * as userService from '../services/userService.js';
+import { UnauthorizedError } from '../middleware/errorHandlingExpress.js';
 
 // User login
-export async function login(req, res) {
+export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
     const user = await userService.authenticateUser(email, password);
@@ -10,22 +11,21 @@ export async function login(req, res) {
       const token = jwtutil.createToken({ id: user.id, email: user.email });
       res.json({ token });
     } else {
-      res.status(401).json({ message: 'Invalid credentials' });
+      throw new UnauthorizedError('Email ou mot de passe incorrect');
     }
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 }
 
 // User registration
-export async function register(req, res) {
-  const { email, password } = req.body;
-  const user = await userService.createUser(email, password);
-  if (user) {
-    res.status(201).json({ message: 'User created successfully' });
-  } else {
-    res.status(400).json({ message: 'User creation failed' });
+export async function register(req, res, next) {
+  try {
+    const { email, password } = req.body;
+    const user = await userService.createUser(email, password);
+    res.status(201).json({ message: 'User created successfully', user: { id: user.id, email: user.email } });
+  } catch (error) {
+    next(error);
   }
 }
 

@@ -9,9 +9,19 @@ export async function getUserByEmail(email) {
 // Insert new user
 export async function insertUser(userData) {
   const { email, password_hash } = userData;
-  const [result] = await db.execute(
-    'INSERT INTO users (email, password_hash) VALUES (?, ?)',
-    [email, password_hash]
-  );
-  return { id: result.insertId, email };
+  try {
+    const [result] = await db.execute(
+      'INSERT INTO users (email, password_hash) VALUES (?, ?)',
+      [email, password_hash]
+    );
+    return { id: result.insertId, email };
+  } catch (error) {
+    // Erreur de doublon MySQL (code 1062 ou ER_DUP_ENTRY)
+    if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062) {
+      const duplicateError = new Error('Cet email est déjà utilisé');
+      duplicateError.code = 'DUPLICATE_ENTRY';
+      throw duplicateError;
+    }
+    throw error;
+  }
 }

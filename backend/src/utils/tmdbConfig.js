@@ -2,6 +2,7 @@
 
 import '../config/config.js'; // Ensure env vars are loaded
 import XMLHttpRequest from 'xhr2';
+import { TmdbApiError, TooManyRequestsError, ServiceUnavailableError, NotFoundError, UnauthorizedError } from '../middleware/errorHandlingExpress.js';
 
 // Helper function to make TMDB API requests using XHR
 export function tmdbFetch(endpoint, params = {}) {
@@ -22,13 +23,51 @@ export function tmdbFetch(endpoint, params = {}) {
     xhr.setRequestHeader('Content-Type', 'application/json');
 
     xhr.onload = () => {
-      const data = JSON.parse(xhr.responseText);
-      xhr.status >= 200 && xhr.status < 300
-        ? resolve(data)
-        : reject(new Error(data.status_message || `TMDB API error: ${xhr.status}`));
+      try {
+        const data = JSON.parse(xhr.responseText);
+        
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(data);
+        } else {
+          // Gestion des différents codes d'erreur TMDB
+          const errorMessage = data.status_message || `Erreur TMDB API: ${xhr.status}`;
+          
+          switch (xhr.status) {
+            case 401:
+              reject(new UnauthorizedError('Clé API TMDB invalide ou manquante'));
+              break;
+            case 404:
+              reject(new NotFoundError('Ressource non trouvée sur TMDB'));
+              break;
+            case 429:
+              reject(new TooManyRequestsError('Limite de requêtes TMDB atteinte'));
+              break;
+            case 503:
+              reject(new ServiceUnavailableError('TMDB temporairement indisponible'));
+              break;
+            default:
+              reject(new TmdbApiError(xhr.status, errorMessage));
+          }
+        }
+      } catch (parseError) {
+        console.error('[TMDB] Erreur de parsing JSON:', parseError);
+        reject(new TmdbApiError(xhr.status, 'Réponse TMDB invalide', parseError));
+      }
     };
 
-    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onerror = () => {
+      console.error('[TMDB] Erreur réseau');
+      reject(new ServiceUnavailableError('Impossible de contacter TMDB'));
+    };
+    
+    xhr.ontimeout = () => {
+      console.error('[TMDB] Timeout');
+      reject(new ServiceUnavailableError('TMDB ne répond pas (timeout)'));
+    };
+    
+    // Timeout de 10 secondes
+    xhr.timeout = 10000;
+    
     xhr.send();
   });
 }

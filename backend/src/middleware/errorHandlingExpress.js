@@ -1,7 +1,6 @@
 // On exporte de nouvelles erreurs en utilisant Error
 export class BadRequestError extends Error {
-  constructor(message = 'Requête invalide') {// message par défaut Requête invalide
-    // On ajoute 2 nouveaux paramètres à notre Erreur
+  constructor(message = 'Requête invalide') {
     super(message);
     this.name = 'BadRequestError';
     this.status = 400;
@@ -24,11 +23,44 @@ export class NotFoundError extends Error {
   }
 }
 
+export class ConflictError extends Error {
+  constructor(message = 'Conflit - La ressource existe déjà') {
+    super(message);
+    this.name = 'ConflictError';
+    this.status = 409;
+  }
+}
+
 export class InternalServerError extends Error {
   constructor(message = 'Erreur interne du serveur') {
     super(message);
     this.name = 'InternalServerError';
     this.status = 500;
+  }
+}
+
+export class TooManyRequestsError extends Error {
+  constructor(message = 'Trop de requêtes, veuillez réessayer plus tard') {
+    super(message);
+    this.name = 'TooManyRequestsError';
+    this.status = 429;
+  }
+}
+
+export class ServiceUnavailableError extends Error {
+  constructor(message = 'Service temporairement indisponible') {
+    super(message);
+    this.name = 'ServiceUnavailableError';
+    this.status = 503;
+  }
+}
+
+export class TmdbApiError extends Error {
+  constructor(statusCode, message, originalError = null) {
+    super(message);
+    this.name = 'TmdbApiError';
+    this.status = statusCode;
+    this.originalError = originalError;
   }
 }
 
@@ -67,6 +99,15 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  if (err instanceof ConflictError) {
+    return res.status(409).json({
+      error: {
+        message: err.message,
+        status: 409
+      }
+    });
+  }
+
   if (err instanceof InternalServerError) {
     return res.status(500).json({
       error: {
@@ -76,11 +117,39 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  if (err instanceof TooManyRequestsError) {
+    return res.status(429).json({
+      error: {
+        message: err.message,
+        status: 429
+      }
+    });
+  }
+
+  if (err instanceof ServiceUnavailableError) {
+    return res.status(503).json({
+      error: {
+        message: err.message,
+        status: 503
+      }
+    });
+  }
+
+  if (err instanceof TmdbApiError) {
+    return res.status(err.status).json({
+      error: {
+        message: err.message,
+        status: err.status,
+        service: 'TMDB'
+      }
+    });
+  }
+
   // Erreur par défaut (500) pour toutes les autres erreurs non gérées
-  return res.status(500).json({
+  return res.status(err.status || 500).json({
     error: {
-      message: 'Erreur interne du serveur',
-      status: 500
+      message: err.message || 'Erreur interne du serveur',
+      status: err.status || 500
     }
   });
 };

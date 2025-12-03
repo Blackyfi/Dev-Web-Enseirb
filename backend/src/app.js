@@ -38,16 +38,11 @@ app.use('/auth', authRoutes);
 app.use('/movies', moviesRoutes); 
 app.use('/me', favoritesRoutes); 
 
-// Middleware de gestion d'erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: { 
-      message: 'Une erreur est survenue',
-      ...(process.env.NODE_ENV === 'development' && { details: err.message })
-    } 
-  });
-});
+// Import du middleware de gestion d'erreurs personnalisé
+import { errorHandler } from './middleware/errorHandlingExpress.js';
+
+// Middleware de gestion d'erreurs (doit être en dernier)
+app.use(errorHandler);
 
 // Démarrage du serveur
 app.listen(BACKEND_PORT, () => {
