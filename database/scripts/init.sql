@@ -14,6 +14,8 @@ CREATE TABLE favorites (
     user_id INT NOT NULL,
     movie_id INT NOT NULL,
     type ENUM('movie', 'tv') NOT NULL,
+    rating INT DEFAULT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY unique_user_movie (user_id, movie_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

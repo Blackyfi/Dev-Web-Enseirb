@@ -1,16 +1,13 @@
 import * as mediaService from '../services/moviesService.js';
-import { BadRequestError } from '../middleware/errorHandlingExpress.js';
 
 // Search movies by name
 export async function searchMoviesByName(req, res, next) {
   try {
-    const { name } = req.query;
-    if (!name) {
-      throw new BadRequestError('Le paramètre "name" est requis');
-    }
-    
-    const movies = await mediaService.searchMoviesByName(name);
-    res.json(movies);
+    // Accepter "name" ou "q" comme paramètre de recherche
+    const searchQuery = req.query.name || req.query.q;
+
+    const movies = await mediaService.searchMoviesByName(searchQuery);
+    res.json({ results: movies });
   } catch (error) {
     next(error);
   }

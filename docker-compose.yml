@@ -50,6 +50,22 @@ services:
         condition: service_healthy
 
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - seenflix-network
+    environment:
+      NODE_ENV: production
+    ports:
+      - "9080:8080"
+    depends_on:
+      - backend
+
+
+
 volumes:
   mysql-data:
 

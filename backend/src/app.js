@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.js';
 import moviesRoutes from './routes/movies.js';
-import favoritesRoutes from './routes/favorites_routes.js';
+import favoritesRoutes from './routes/favorites.js';
 
 const app = express();
 const BACKEND_PORT = process.env.BACKEND_PORT;
