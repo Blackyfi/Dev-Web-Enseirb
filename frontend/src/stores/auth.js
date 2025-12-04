@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Store Pinia pour l'authentification
  * Gère l'état de l'utilisateur et du token
@@ -206,5 +207,42 @@ export const useAuthStore = defineStore('auth', () => {
     fetchCurrentUser,
     refreshAuthToken,
     init,
+=======
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref(localStorage.getItem('token') || null)
+  const user = ref(null)
+
+  const isAuthenticated = computed(() => !!token.value)
+
+  function setToken(newToken) {
+    token.value = newToken
+    if (newToken) {
+      localStorage.setItem('token', newToken)
+    } else {
+      localStorage.removeItem('token')
+    }
+  }
+
+  function setUser(userData) {
+    user.value = userData
+  }
+
+  function logout() {
+    token.value = null
+    user.value = null
+    localStorage.removeItem('token')
+  }
+
+  return {
+    token,
+    user,
+    isAuthenticated,
+    setToken,
+    setUser,
+    logout
+>>>>>>> b43242a2191037a02c0b06e416dc3dce602f0e44
   }
 })
