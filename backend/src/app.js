@@ -5,9 +5,17 @@ const LOG_LEVEL = process.env.LOG_LEVEL || 'dev';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import authRoutes from './routes/auth.js';
 import moviesRoutes from './routes/movies.js';
 import favoritesRoutes from './routes/favorites.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const swaggerDocument = YAML.load(join(__dirname, process.env.NODE_ENV === 'production' ? '../openapi.yaml' : '../../openapi.yaml'));
 
 const app = express();
 const BACKEND_PORT = process.env.BACKEND_PORT;
@@ -33,9 +41,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Documentation Swagger
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Routes
 app.use('/auth', authRoutes);
-app.use('/movies', moviesRoutes); 
+app.use('/movies', moviesRoutes);
 app.use('/me', favoritesRoutes); 
 
 // Import du middleware de gestion d'erreurs personnalisé
