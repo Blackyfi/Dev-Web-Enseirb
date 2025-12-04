@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <h1 class="text-h4 mb-6">Mes Favoris</h1>
+  <v-container class="pb-16 favorites-container">
+    <h1 class="text-h5 mb-4">Mes Favoris</h1>
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
 
@@ -8,10 +8,11 @@
       <v-col
         v-for="favorite in favorites"
         :key="favorite.id"
+        class="d-flex flex-column favorite-item"
         cols="12"
-        sm="6"
-        md="4"
         lg="3"
+        md="4"
+        sm="6"
       >
         <MovieCard
           :movie="favorite"
@@ -120,3 +121,28 @@ function formatDate(dateString) {
 }
 </script>
 
+<style scoped>
+.favorites-container {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.favorite-item {
+  max-height: calc(100vh - 200px);
+}
+
+.favorite-item :deep(.v-card) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorite-item :deep(.v-card-text) {
+  font-size: 0.8rem;
+}
+
+.favorite-item :deep(.v-card img) {
+  max-height: 300px;
+  object-fit: cover;
+}
+</style>
