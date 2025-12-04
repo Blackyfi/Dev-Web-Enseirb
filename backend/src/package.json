@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "nodemon",
     "start": "node index.js",
-    "test": "echo \"Tests à implémenter\" && exit 0"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "seenflix",
@@ -33,6 +35,8 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@vitest/coverage-v8": "^4.0.15",
+    "nodemon": "^3.1.11",
+    "vitest": "^4.0.15"
   }
 }
