@@ -6,6 +6,12 @@ export async function getUserByEmail(email) {
   return rows[0];
 }
 
+// Get user by ID
+export async function getUserById(id) {
+  const [rows] = await db.execute('SELECT id, email, username, created_at FROM users WHERE id = ?', [id]);
+  return rows[0];
+}
+
 // Insert new user
 export async function insertUser(userData) {
   const { email, password_hash } = userData;
@@ -24,4 +30,11 @@ export async function insertUser(userData) {
     }
     throw error;
   }
+}
+
+// Update user profile
+export async function updateUser(id, data) {
+  const { username } = data;
+  await db.execute('UPDATE users SET username = ? WHERE id = ?', [username, id]);
+  return getUserById(id);
 }

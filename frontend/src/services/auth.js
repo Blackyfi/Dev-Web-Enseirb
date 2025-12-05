@@ -33,10 +33,25 @@ export const getCurrentUser = async () => {
 }
 
 /**
+ * Récupérer le profil utilisateur
+ */
+export const getProfile = async () => {
+  return await api.get('/me/profile')
+}
+
+/**
+ * Mettre à jour le profil utilisateur
+ */
+export const updateProfile = async (data) => {
+  return await api.put('/me/profile', data)
+}
+
+/**
  * Rafraîchir le token d'authentification
  */
 export const refreshToken = async (refreshToken) => {
   return await api.post('/auth/refresh', { refreshToken })
 }
 
-export default { login, register, logout, getCurrentUser, refreshToken }
+export default { login, register, logout, getCurrentUser, getProfile, updateProfile, refreshToken }
+

@@ -4,7 +4,9 @@
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
         <h1 class="text-h4 font-weight-bold">
-          <span v-if="authStore.isAuthenticated">Bonjour !</span>
+          <span v-if="authStore.isAuthenticated"
+            >Bonjour {{ authStore.userName }} !</span
+          >
           <span v-else>Découvrez</span>
         </h1>
         <p class="text-subtitle-1 text-grey">Films et séries du moment</p>

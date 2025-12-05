@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!token.value)
-  const userName = computed(() => user.value?.firstName || user.value?.email || 'Utilisateur')
+  const userName = computed(() => user.value?.username || user.value?.email || 'Utilisateur')
 
   /**
    * Initialiser le store depuis localStorage

@@ -1,10 +1,5 @@
 <template>
-  <v-navigation-drawer
-    app
-    permanent
-    :width="280"
-    color="secondary"
-  >
+  <v-navigation-drawer app permanent :width="280" color="secondary">
     <!-- Section recherche -->
     <v-list class="pa-4">
       <v-text-field
@@ -47,6 +42,15 @@
         color="primary"
         @click="navigateTo('/favorites')"
       />
+
+      <v-list-item
+        v-if="authStore.isAuthenticated"
+        prepend-icon="mdi-account-cog"
+        title="Mon compte"
+        value="account"
+        color="primary"
+        @click="navigateTo('/account')"
+      />
     </v-list>
 
     <v-divider />
@@ -67,7 +71,7 @@
           </template>
 
           <v-list-item-title class="text-white font-weight-medium">
-            {{ authStore.user.firstName || authStore.user.email }}
+            {{ authStore.user.username || authStore.user.email }}
           </v-list-item-title>
           <v-list-item-subtitle class="text-grey">
             {{ authStore.user.email }}
@@ -101,50 +105,50 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-const searchQuery = ref('')
+const searchQuery = ref("");
 
 const navigateTo = (path) => {
-  router.push(path)
-}
+  router.push(path);
+};
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
     router.push({
-      path: '/search',
-      query: { q: searchQuery.value.trim() }
-    })
+      path: "/search",
+      query: { q: searchQuery.value.trim() },
+    });
   }
-}
+};
 
 const handleLogout = async () => {
   try {
-    await authStore.logout()
-    router.push('/login')
+    await authStore.logout();
+    router.push("/login");
   } catch (error) {
-    console.error('Erreur lors de la déconnexion:', error)
+    console.error("Erreur lors de la déconnexion:", error);
   }
-}
+};
 
 const getUserInitials = () => {
-  if (!authStore.user) return '?'
+  if (!authStore.user) return "?";
 
-  if (authStore.user.firstName) {
-    return authStore.user.firstName.charAt(0).toUpperCase()
+  if (authStore.user.username) {
+    return authStore.user.username.charAt(0).toUpperCase();
   }
 
   if (authStore.user.email) {
-    return authStore.user.email.charAt(0).toUpperCase()
+    return authStore.user.email.charAt(0).toUpperCase();
   }
 
-  return '?'
-}
+  return "?";
+};
 </script>
 
 <style scoped>

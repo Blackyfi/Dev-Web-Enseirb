@@ -13,6 +13,11 @@ export async function authenticateUser(email, password) {
   return null;
 }
 
+// Get user by ID
+export async function getUser(id) {
+  return await userDb.getUserById(id);
+}
+
 // Create a new user
 export async function createUser(email, password) {
   try {
@@ -25,4 +30,9 @@ export async function createUser(email, password) {
     }
     throw error;
   }
+}
+
+// Update user profile
+export async function updateProfile(id, data) {
+  return await userDb.updateUser(id, data);
 }

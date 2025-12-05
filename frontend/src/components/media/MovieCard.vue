@@ -3,7 +3,7 @@
     class="movie-card"
     hover
     @click="handleCardClick"
-    style="cursor: pointer;"
+    style="cursor: pointer"
   >
     <v-img
       :src="getImageUrl(movie.poster_path)"
@@ -25,7 +25,7 @@
         size="small"
         variant="elevated"
       >
-        {{ effectiveType === 'movie' ? 'Film' : 'Série' }}
+        {{ effectiveType === "movie" ? "Film" : "Série" }}
       </v-chip>
     </v-img>
 
@@ -63,58 +63,58 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 
 const props = defineProps({
   movie: {
     type: Object,
-    required: true
+    required: true,
   },
   showFavoriteButton: {
     type: Boolean,
-    default: true
+    default: true,
   },
   showType: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-defineEmits(['add-favorite'])
+defineEmits(["add-favorite"]);
 
 // Compute effective type from type or media_type
 const effectiveType = computed(() => {
-  return props.movie.type || props.movie.media_type || null
-})
+  return props.movie.type || props.movie.media_type || null;
+});
 
 const getImageUrl = (posterPath) => {
-  if (!posterPath) return ''
-  return `https://image.tmdb.org/t/p/w500${posterPath}`
-}
+  if (!posterPath) return "";
+  return `https://image.tmdb.org/t/p/w500${posterPath}`;
+};
 
 const getYear = (dateString) => {
-  if (!dateString) return ''
-  return new Date(dateString).getFullYear()
-}
+  if (!dateString) return "";
+  return new Date(dateString).getFullYear();
+};
 
 const formatRating = (rating) => {
-  if (!rating) return 'N/A'
-  return rating.toFixed(1)
-}
+  if (!rating) return "N/A";
+  return rating.toFixed(1);
+};
 
 const handleCardClick = () => {
   // Utiliser tmdbId si disponible (cas des favoris), sinon id (cas de recherche/trending)
-  const movieId = props.movie.tmdbId || props.movie.id
-  const movieType = props.movie.type || 'movie'
+  const movieId = props.movie.tmdbId || props.movie.id;
+  const movieType = props.movie.type || "movie";
 
   router.push({
-    path: `/movie/${movieId}`,
-    query: { type: movieType }
-  })
-}
+    path: `/media/${movieId}`,
+    query: { type: movieType },
+  });
+};
 </script>
 
 <style scoped>
@@ -125,12 +125,12 @@ const handleCardClick = () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .movie-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
 .movie-poster {
@@ -139,13 +139,13 @@ const handleCardClick = () => {
 }
 
 .movie-poster::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 100px;
-  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
   pointer-events: none;
 }
 
@@ -173,7 +173,7 @@ const handleCardClick = () => {
 
 :deep(.v-card-actions) {
   padding: 12px 16px;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .type-badge {
