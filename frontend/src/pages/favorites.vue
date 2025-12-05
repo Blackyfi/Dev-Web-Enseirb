@@ -1,17 +1,39 @@
 <template>
-  <v-container>
-    <h1 class="text-h4 mb-6">Mes Favoris</h1>
+  <v-container class="pb-16 favorites-container">
+    <h1 class="text-h5 mb-4">Mes Favoris</h1>
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
 
+    <v-row v-if="favorites.length > 0" class="mb-4">
+      <v-col cols="12" md="6">
+        <v-select
+          v-model="filterType"
+          :items="typeOptions"
+          label="Type"
+          variant="outlined"
+          density="compact"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-select
+          v-model="sortBy"
+          :items="sortOptions"
+          label="Trier par"
+          variant="outlined"
+          density="compact"
+        />
+      </v-col>
+    </v-row>
+
     <v-row v-if="favorites.length > 0">
       <v-col
-        v-for="favorite in favorites"
+        v-for="favorite in filteredFavorites"
         :key="favorite.id"
+        class="d-flex flex-column favorite-item"
         cols="12"
-        sm="6"
-        md="4"
         lg="3"
+        md="4"
+        sm="6"
       >
         <MovieCard
           :movie="favorite"
@@ -68,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import * as favoritesService from '@/services/favorites'
 import MovieCard from '@/components/MovieCard.vue'
@@ -77,6 +99,51 @@ const router = useRouter()
 const favorites = ref([])
 const loading = ref(false)
 const deletingId = ref(null)
+const filterType = ref('all')
+const sortBy = ref('date-desc')
+
+const typeOptions = [
+  { title: 'Tous', value: 'all' },
+  { title: 'Films', value: 'movie' },
+  { title: 'Séries', value: 'tv' }
+]
+
+const sortOptions = [
+  { title: 'Plus récents', value: 'date-desc' },
+  { title: 'Plus anciens', value: 'date-asc' },
+  { title: 'Meilleure note', value: 'rating-desc' },
+  { title: 'Note TMDB', value: 'vote-desc' },
+  { title: 'Titre (A-Z)', value: 'title-asc' }
+]
+
+const filteredFavorites = computed(() => {
+  let result = [...favorites.value]
+
+  if (filterType.value !== 'all') {
+    result = result.filter(f => f.type === filterType.value)
+  }
+
+  result.sort((a, b) => {
+    switch (sortBy.value) {
+      case 'date-desc':
+        return new Date(b.created_at) - new Date(a.created_at)
+      case 'date-asc':
+        return new Date(a.created_at) - new Date(b.created_at)
+      case 'rating-desc':
+        return (b.rating || 0) - (a.rating || 0)
+      case 'vote-desc':
+        return (b.vote_average || 0) - (a.vote_average || 0)
+      case 'title-asc':
+        const titleA = (a.title || a.name || '').toLowerCase()
+        const titleB = (b.title || b.name || '').toLowerCase()
+        return titleA.localeCompare(titleB)
+      default:
+        return 0
+    }
+  })
+
+  return result
+})
 
 onMounted(() => {
   loadFavorites()
@@ -120,3 +187,28 @@ function formatDate(dateString) {
 }
 </script>
 
+<style scoped>
+.favorites-container {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.favorite-item {
+  max-height: calc(100vh - 200px);
+}
+
+.favorite-item :deep(.v-card) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorite-item :deep(.v-card-text) {
+  font-size: 0.8rem;
+}
+
+.favorite-item :deep(.v-card img) {
+  max-height: 300px;
+  object-fit: cover;
+}
+</style>
