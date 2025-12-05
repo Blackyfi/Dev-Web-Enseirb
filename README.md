@@ -20,20 +20,22 @@ Copy the `.env.example` file into `.env` and add your development variables.
 
 ### 3. Run the app !
 
-‘‘‘bash
+```bash
 docker compose up -d --build
-‘‘‘
+```
 
 This will:
 - Start the database via Docker
 - Run the backend and frontend
-- Expose ports 9090 and 9080
+- Expose ports 9090 and 9080 (9080 for main pages and 9090 for the Swagger)
 
 ### Other commands
 
 You can also test the code using vitest
 
 ```bash
+cd backend/src
+
 npm run test:coverage
 ```
 
@@ -57,8 +59,7 @@ docker compose down
 
 ## Contributors
 
-We have a authors.md file in which you have the translation Contributor to Github Username
+We have a authors.md file at the root of the project in which you have the translation "Contributor" to "Github Username".
 - Malo Andre
 - Nicolas Thongphao
 - Tim Mazzolini
-
