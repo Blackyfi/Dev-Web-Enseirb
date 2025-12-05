@@ -1,0 +1,32 @@
+meta {
+  name: Multi Search
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/movies/search/multi?q={{searchQuery}}&type={{searchType}}
+  body: none
+  auth: none
+}
+
+params:query {
+  q: {{searchQuery}}
+  type: {{searchType}}
+}
+
+vars:pre-request {
+  searchQuery: Breaking Bad
+  searchType: all
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains results array", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('results');
+  });
+}

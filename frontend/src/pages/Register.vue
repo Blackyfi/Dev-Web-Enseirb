@@ -3,12 +3,11 @@
 </template>
 
 <script setup>
-import RegisterForm from '@/components/RegisterForm.vue'
+import RegisterForm from "@/components/auth/RegisterForm.vue";
 
 definePage({
   meta: {
-    layout: 'auth',
+    layout: "auth",
   },
-})
+});
 </script>
-

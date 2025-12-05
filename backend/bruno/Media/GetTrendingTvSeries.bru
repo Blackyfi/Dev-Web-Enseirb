@@ -1,0 +1,22 @@
+meta {
+  name: Get Trending TV Series
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/tv/trending
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains results array", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('results');
+  });
+}

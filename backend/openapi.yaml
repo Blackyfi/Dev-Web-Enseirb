@@ -58,6 +58,38 @@ components:
             status:
               type: integer
 
+    MediaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+          description: Titre du film (absent pour les séries)
+        name:
+          type: string
+          description: Nom de la série (absent pour les films)
+        poster_path:
+          type: string
+        backdrop_path:
+          type: string
+        overview:
+          type: string
+        release_date:
+          type: string
+          description: Date de sortie du film
+        first_air_date:
+          type: string
+          description: Date de première diffusion de la série
+        vote_average:
+          type: number
+        vote_count:
+          type: integer
+        media_type:
+          type: string
+          enum: [movie, tv]
+          description: Type de média (retourné par multi-search)
+
 paths:
   /auth/register:
     post:
@@ -174,9 +206,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /movies/search:
+  /movies/search/multi:
     get:
-      summary: Recherche de films/séries
+      summary: Recherche multi (films et séries)
       tags: [Films/Séries]
       parameters:
         - name: q
@@ -184,7 +216,38 @@ paths:
           required: true
           schema:
             type: string
-            minLength: 1
+          description: Mot-clé de recherche
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, movie, tv]
+            default: all
+          description: Type de contenu à rechercher
+      responses:
+        '200':
+          description: Résultats de recherche
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /movies/search:
+    get:
+      summary: Recherche de films
+      tags: [Films/Séries]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
           description: Mot-clé de recherche
       responses:
         '200':
@@ -197,32 +260,137 @@ paths:
                   results:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        title:
-                          type: string
-                        poster_path:
-                          type: string
-                        overview:
-                          type: string
-                        release_date:
-                          type: string
-                        vote_average:
-                          type: number
-        '400':
-          description: Paramètre de recherche manquant
+                      $ref: '#/components/schemas/MediaItem'
+
+  /movies/trending:
+    get:
+      summary: Films tendances de la semaine
+      tags: [Films/Séries]
+      responses:
+        '200':
+          description: Liste des films tendances
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Erreur lors de l'appel à l'API externe
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /movies/popular:
+    get:
+      summary: Films populaires
+      tags: [Films/Séries]
+      responses:
+        '200':
+          description: Liste des films populaires
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /movies/{id}:
+    get:
+      summary: Détails d'un film
+      tags: [Films/Séries]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID TMDB du film
+      responses:
+        '200':
+          description: Détails du film
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaItem'
+
+  /tv/search:
+    get:
+      summary: Recherche de séries TV
+      tags: [Films/Séries]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Mot-clé de recherche
+      responses:
+        '200':
+          description: Résultats de recherche
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /tv/trending:
+    get:
+      summary: Séries TV tendances de la semaine
+      tags: [Films/Séries]
+      responses:
+        '200':
+          description: Liste des séries tendances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /tv/popular:
+    get:
+      summary: Séries TV populaires
+      tags: [Films/Séries]
+      responses:
+        '200':
+          description: Liste des séries populaires
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaItem'
+
+  /tv/{id}:
+    get:
+      summary: Détails d'une série TV
+      tags: [Films/Séries]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID TMDB de la série
+      responses:
+        '200':
+          description: Détails de la série
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaItem'
 
   /me/favorites:
     get:

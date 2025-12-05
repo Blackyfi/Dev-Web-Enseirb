@@ -9,7 +9,7 @@
     <v-list class="pa-4">
       <v-text-field
         v-model="searchQuery"
-        placeholder="Rechercher un film..."
+        placeholder="Rechercher un film ou une série ..."
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         density="compact"
@@ -34,7 +34,7 @@
 
       <v-list-item
         prepend-icon="mdi-movie-open"
-        title="Rechercher des films"
+        title="Rechercher"
         value="search"
         color="primary"
         @click="navigateTo('/search')"

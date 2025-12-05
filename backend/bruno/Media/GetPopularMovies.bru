@@ -1,0 +1,22 @@
+meta {
+  name: Get Popular Movies
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/movies/popular
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains results array", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('results');
+  });
+}
