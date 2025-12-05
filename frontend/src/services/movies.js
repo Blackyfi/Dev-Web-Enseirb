@@ -15,6 +15,27 @@ export const searchMovies = async (query) => {
 }
 
 /**
+ * Rechercher des séries par nom
+ * @param {string} query - Terme de recherche
+ * @returns {Promise<Array>} Liste des séries
+ */
+export const searchSeries = async (query) => {
+  const response = await api.get(`/tv/search?q=${encodeURIComponent(query)}`)
+  return response
+}
+
+/**
+ * Recherche multi (films, séries ou les deux)
+ * @param {string} query - Terme de recherche
+ * @param {string} type - Type de recherche ('all', 'movie', 'tv')
+ * @returns {Promise<Array>} Liste des résultats
+ */
+export const searchMulti = async (query, type = 'all') => {
+  const response = await api.get(`/movies/search/multi?q=${encodeURIComponent(query)}&type=${type}`)
+  return response
+}
+
+/**
  * Obtenir les détails d'un film ou d'une série
  * @param {number} movieId - ID TMDB du film/série
  * @param {string} type - Type de contenu ('movie' ou 'tv')
@@ -64,6 +85,8 @@ export const getPopularSeries = async () => {
 
 export default {
   searchMovies,
+  searchSeries,
+  searchMulti,
   getMovieDetails,
   getTrendingMovies,
   getTrendingSeries,

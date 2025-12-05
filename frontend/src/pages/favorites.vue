@@ -1,91 +1,223 @@
 <template>
-  <v-container class="pb-16 favorites-container">
-    <h1 class="text-h5 mb-4">Mes Favoris</h1>
+  <v-container class="favorites-page">
+    <!-- Header with stats -->
+    <div class="d-flex align-center justify-space-between mb-6">
+      <div>
+        <h1 class="text-h4 font-weight-bold">Mes Favoris</h1>
+        <p v-if="favorites.length > 0" class="text-subtitle-1 text-grey mt-1">
+          {{ filteredFavorites.length }} {{ filteredFavorites.length > 1 ? 'éléments' : 'élément' }}
+          <span v-if="filterType !== 'all'">
+            ({{ filterType === 'movie' ? 'films' : 'séries' }})
+          </span>
+        </p>
+      </div>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-magnify"
+        @click="$router.push('/search')"
+      >
+        Ajouter
+      </v-btn>
+    </div>
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
 
-    <v-row v-if="favorites.length > 0" class="mb-4">
-      <v-col cols="12" md="6">
-        <v-select
-          v-model="filterType"
-          :items="typeOptions"
-          label="Type"
-          variant="outlined"
-          density="compact"
-        />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-select
-          v-model="sortBy"
-          :items="sortOptions"
-          label="Trier par"
-          variant="outlined"
-          density="compact"
-        />
-      </v-col>
-    </v-row>
+    <!-- Filters -->
+    <v-card v-if="favorites.length > 0" class="mb-6 pa-4" variant="outlined">
+      <v-row align="center">
+        <v-col cols="12" sm="6" md="4">
+          <v-btn-toggle
+            v-model="filterType"
+            mandatory
+            color="primary"
+            density="comfortable"
+            rounded="pill"
+          >
+            <v-btn value="all" size="small">
+              <v-icon start size="small">mdi-view-grid</v-icon>
+              Tous
+            </v-btn>
+            <v-btn value="movie" size="small">
+              <v-icon start size="small">mdi-movie</v-icon>
+              Films
+            </v-btn>
+            <v-btn value="tv" size="small">
+              <v-icon start size="small">mdi-television</v-icon>
+              Séries
+            </v-btn>
+          </v-btn-toggle>
+        </v-col>
+        <v-col cols="12" sm="6" md="4">
+          <v-select
+            v-model="sortBy"
+            :items="sortOptions"
+            label="Trier par"
+            variant="outlined"
+            density="compact"
+            hide-details
+            prepend-inner-icon="mdi-sort"
+          />
+        </v-col>
+      </v-row>
+    </v-card>
 
-    <v-row v-if="favorites.length > 0">
+    <!-- Favorites Grid -->
+    <v-row v-if="filteredFavorites.length > 0">
       <v-col
         v-for="favorite in filteredFavorites"
         :key="favorite.id"
-        class="d-flex flex-column favorite-item"
         cols="12"
-        lg="3"
-        md="4"
         sm="6"
+        md="4"
+        lg="3"
       >
-        <MovieCard
-          :movie="favorite"
-          :show-favorite-button="false"
-          :show-type="true"
-        >
-          <template #actions>
+        <v-card class="favorite-card h-100" hover>
+          <!-- Poster -->
+          <v-img
+            :src="getImageUrl(favorite.poster_path)"
+            height="300"
+            cover
+            class="favorite-poster"
+            @click="goToDetails(favorite)"
+          >
+            <template v-slot:placeholder>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-icon size="64" color="grey">mdi-movie</v-icon>
+              </v-row>
+            </template>
+            
+            <!-- Type Badge -->
+            <v-chip
+              class="ma-2"
+              :color="favorite.type === 'movie' ? 'blue' : 'purple'"
+              size="small"
+            >
+              {{ favorite.type === 'movie' ? 'Film' : 'Série' }}
+            </v-chip>
+            
+            <!-- Delete Button Overlay -->
+            <v-btn
+              class="delete-btn"
+              icon="mdi-delete"
+              color="error"
+              size="small"
+              variant="flat"
+              @click.stop="confirmDelete(favorite)"
+            />
+          </v-img>
+
+          <!-- Content -->
+          <v-card-title class="text-subtitle-1 font-weight-bold pb-1" @click="goToDetails(favorite)">
+            {{ favorite.title || favorite.name }}
+          </v-card-title>
+
+          <v-card-text class="pb-2">
+            <!-- Rating & Year -->
+            <div class="d-flex align-center gap-3 mb-2">
+              <v-chip size="x-small" color="amber" variant="flat">
+                <v-icon start size="small">mdi-star</v-icon>
+                {{ formatRating(favorite.vote_average) }}
+              </v-chip>
+              <span class="text-caption text-grey">
+                {{ getYear(favorite.release_date || favorite.first_air_date) }}
+              </span>
+            </div>
+
+            <!-- User rating if exists -->
+            <div v-if="favorite.rating" class="d-flex align-center mb-2">
+              <v-rating
+                :model-value="favorite.rating"
+                readonly
+                density="compact"
+                size="small"
+                color="amber"
+                half-increments
+              />
+              <span class="text-caption ml-2">Ma note</span>
+            </div>
+
+            <!-- Comment if exists -->
+            <p v-if="favorite.comment" class="text-caption text-grey-darken-1 font-italic mb-2">
+              "{{ favorite.comment }}"
+            </p>
+
+            <!-- Added date -->
+            <p class="text-caption text-grey mb-0">
+              <v-icon size="x-small" class="mr-1">mdi-calendar-plus</v-icon>
+              Ajouté {{ formatDate(favorite.created_at) }}
+            </p>
+          </v-card-text>
+
+          <v-card-actions class="pt-0">
             <v-btn
               color="error"
               variant="text"
-              @click="removeFavorite(favorite.id)"
-              :loading="deletingId === favorite.id"
+              size="small"
+              prepend-icon="mdi-heart-remove"
+              @click="confirmDelete(favorite)"
             >
-              <v-icon>mdi-delete</v-icon>
               Retirer
             </v-btn>
-          </template>
-        </MovieCard>
-
-        <!-- Informations additionnelles -->
-        <v-card class="mt-2" variant="outlined">
-          <v-card-text class="py-2">
-            <div v-if="favorite.rating" class="mb-1">
-              <v-icon color="amber" size="small">mdi-star</v-icon>
-              <span class="text-caption ml-1">Ma note: {{ favorite.rating }}/5</span>
-            </div>
-            <p v-if="favorite.comment" class="text-caption text-grey mb-1">
-              "{{ favorite.comment }}"
-            </p>
-            <p class="text-caption text-grey-darken-1 mb-0">
-              Ajouté le {{ formatDate(favorite.created_at) }}
-            </p>
-          </v-card-text>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              variant="text"
+              size="small"
+              prepend-icon="mdi-eye"
+              @click="goToDetails(favorite)"
+            >
+              Détails
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-alert
-      v-else-if="!loading"
-      type="info"
-      variant="tonal"
-    >
-      Vous n'avez pas encore de favoris. Recherchez des films pour en ajouter !
+    <!-- Empty State -->
+    <v-card v-else-if="!loading" class="pa-8 text-center" variant="flat" color="grey-lighten-4">
+      <v-icon size="80" color="grey-lighten-1" class="mb-4">mdi-heart-outline</v-icon>
+      <h2 class="text-h5 mb-2">Aucun favori</h2>
+      <p class="text-body-1 text-grey mb-4">
+        Vous n'avez pas encore de favoris. Recherchez des films ou séries pour en ajouter !
+      </p>
       <v-btn
-        class="mt-2"
         color="primary"
-        variant="flat"
+        size="large"
+        prepend-icon="mdi-magnify"
         @click="$router.push('/search')"
       >
-        Rechercher des films
+        Rechercher
       </v-btn>
-    </v-alert>
+    </v-card>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card>
+        <v-card-title class="text-h6">
+          <v-icon color="error" class="mr-2">mdi-alert</v-icon>
+          Confirmer la suppression
+        </v-card-title>
+        <v-card-text>
+          Voulez-vous vraiment retirer <strong>{{ favoriteToDelete?.title || favoriteToDelete?.name }}</strong> de vos favoris ?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="deleteDialog = false">Annuler</v-btn>
+          <v-btn color="error" variant="flat" @click="removeFavorite" :loading="deleting">
+            Retirer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Snackbar for notifications -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000" location="bottom right">
+      {{ snackbar.message }}
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbar.show = false">Fermer</v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -93,20 +225,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import * as favoritesService from '@/services/favorites'
-import MovieCard from '@/components/MovieCard.vue'
 
 const router = useRouter()
 const favorites = ref([])
 const loading = ref(false)
-const deletingId = ref(null)
+const deleting = ref(false)
 const filterType = ref('all')
 const sortBy = ref('date-desc')
+const deleteDialog = ref(false)
+const favoriteToDelete = ref(null)
 
-const typeOptions = [
-  { title: 'Tous', value: 'all' },
-  { title: 'Films', value: 'movie' },
-  { title: 'Séries', value: 'tv' }
-]
+const snackbar = ref({
+  show: false,
+  message: '',
+  color: 'success'
+})
 
 const sortOptions = [
   { title: 'Plus récents', value: 'date-desc' },
@@ -157,23 +290,60 @@ async function loadFavorites() {
   } catch (error) {
     console.error('Erreur lors du chargement des favoris:', error)
     favorites.value = []
+    showSnackbar('Erreur lors du chargement des favoris', 'error')
   } finally {
     loading.value = false
   }
 }
 
-async function removeFavorite(favoriteId) {
-  if (!confirm('Êtes-vous sûr de vouloir retirer ce favori ?')) return
+function confirmDelete(favorite) {
+  favoriteToDelete.value = favorite
+  deleteDialog.value = true
+}
 
-  deletingId.value = favoriteId
+async function removeFavorite() {
+  if (!favoriteToDelete.value) return
+
+  deleting.value = true
   try {
-    await favoritesService.deleteFavorite(favoriteId)
-    favorites.value = favorites.value.filter(f => f.id !== favoriteId)
+    await favoritesService.deleteFavorite(favoriteToDelete.value.id)
+    favorites.value = favorites.value.filter(f => f.id !== favoriteToDelete.value.id)
+    showSnackbar(`${favoriteToDelete.value.title || favoriteToDelete.value.name} retiré des favoris`, 'success')
+    deleteDialog.value = false
   } catch (error) {
     console.error('Erreur lors de la suppression:', error)
+    showSnackbar('Erreur lors de la suppression', 'error')
   } finally {
-    deletingId.value = null
+    deleting.value = false
+    favoriteToDelete.value = null
   }
+}
+
+function showSnackbar(message, color = 'success') {
+  snackbar.value = { show: true, message, color }
+}
+
+function goToDetails(favorite) {
+  const id = favorite.tmdbId || favorite.id
+  router.push({
+    path: `/movie/${id}`,
+    query: { type: favorite.type || 'movie' }
+  })
+}
+
+function getImageUrl(posterPath) {
+  if (!posterPath) return ''
+  return `https://image.tmdb.org/t/p/w500${posterPath}`
+}
+
+function getYear(dateString) {
+  if (!dateString) return ''
+  return new Date(dateString).getFullYear()
+}
+
+function formatRating(rating) {
+  if (!rating) return 'N/A'
+  return rating.toFixed(1)
 }
 
 function formatDate(dateString) {
@@ -181,34 +351,46 @@ function formatDate(dateString) {
   const date = new Date(dateString)
   return date.toLocaleDateString('fr-FR', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric'
   })
 }
 </script>
 
 <style scoped>
-.favorites-container {
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
+.favorites-page {
+  max-width: 1400px;
+  padding: 2rem 1rem;
 }
 
-.favorite-item {
-  max-height: calc(100vh - 200px);
+.favorite-card {
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.favorite-item :deep(.v-card) {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+.favorite-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.favorite-item :deep(.v-card-text) {
-  font-size: 0.8rem;
+.favorite-poster {
+  cursor: pointer;
+  position: relative;
 }
 
-.favorite-item :deep(.v-card img) {
-  max-height: 300px;
-  object-fit: cover;
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.favorite-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.gap-3 {
+  gap: 12px;
 }
 </style>

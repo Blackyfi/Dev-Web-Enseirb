@@ -13,6 +13,30 @@ export async function searchMoviesByName(req, res, next) {
   }
 }
 
+// Search series by name
+export async function searchSeriesByName(req, res, next) {
+  try {
+    const searchQuery = req.query.name || req.query.q;
+    const series = await mediaService.searchSeriesByName(searchQuery);
+    res.json({ results: series });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Multi-search (movies, series, or both)
+export async function searchMulti(req, res, next) {
+  try {
+    const searchQuery = req.query.name || req.query.q;
+    const type = req.query.type || 'all'; // all, movie, tv
+
+    const results = await mediaService.searchMulti(searchQuery, type);
+    res.json({ results });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Get movie details by ID
 export async function getMovieDetails(req, res, next) {
   try {

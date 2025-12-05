@@ -1,9 +1,10 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 COPY src/package.json src/package-lock.json* ./
-RUN npm install --production
+
+RUN npm ci
 
 COPY openapi.yaml ./
 COPY src/. .

@@ -19,12 +19,12 @@
 
       <!-- Badge du type (movie/tv) -->
       <v-chip
-        v-if="showType && movie.type"
+        v-if="showType && effectiveType"
         class="ma-2"
-        :color="movie.type === 'movie' ? 'blue' : 'purple'"
+        :color="effectiveType === 'movie' ? 'blue' : 'purple'"
         size="small"
       >
-        {{ movie.type === 'movie' ? 'Film' : 'Série' }}
+        {{ effectiveType === 'movie' ? 'Film' : 'Série' }}
       </v-chip>
     </v-img>
 
@@ -86,6 +86,11 @@ const props = defineProps({
 const emit = defineEmits(['add-favorite', 'remove-favorite', 'click'])
 
 const authStore = useAuthStore()
+
+// Compute effective type from type or media_type
+const effectiveType = computed(() => {
+  return props.movie.type || props.movie.media_type || null
+})
 
 const getImageUrl = (posterPath) => {
   if (!posterPath) return ''

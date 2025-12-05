@@ -29,20 +29,55 @@ export async function searchMoviesByName(name) {
 }
 
 /**
- * Recherche multi-média (films et séries)
- * @param {string} query - Texte de recherche
+ * Recherche de séries TV par nom avec mise en cache
+ * @param {string} name - Nom de la série à rechercher
  * @returns {Promise<Array>} Liste des résultats
  */
-export async function searchMulti(query) {
-  const cacheKey = `multi:search:${query.toLowerCase().trim()}`;
+export async function searchSeriesByName(name) {
+  const cacheKey = `tv:search:${name.toLowerCase().trim()}`;
 
   const cachedData = cacheService.get(cacheKey);
   if (cachedData) {
     return cachedData;
   }
 
-  const data = await tmdbFetch('/search/multi', { query });
+  const data = await tmdbFetch('/search/tv', { query: name });
   const results = data.results || [];
+
+  cacheService.set(cacheKey, results);
+
+  return results;
+}
+
+/**
+ * Recherche multi-média (films et séries)
+ * @param {string} query - Texte de recherche
+ * @param {string} type - Type de recherche ('all', 'movie', 'tv')
+ * @returns {Promise<Array>} Liste des résultats
+ */
+export async function searchMulti(query, type = 'all') {
+  const cacheKey = `${type}:search:${query.toLowerCase().trim()}`;
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  let results = [];
+
+  if (type === 'all') {
+    // Recherche multi (films + séries)
+    const data = await tmdbFetch('/search/multi', { query });
+    results = data.results || [];
+  } else if (type === 'movie') {
+    // Recherche uniquement films
+    const data = await tmdbFetch('/search/movie', { query });
+    results = data.results || [];
+  } else if (type === 'tv') {
+    // Recherche uniquement séries
+    const data = await tmdbFetch('/search/tv', { query });
+    results = data.results || [];
+  }
 
   cacheService.set(cacheKey, results);
 

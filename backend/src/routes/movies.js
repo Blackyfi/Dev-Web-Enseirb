@@ -5,6 +5,9 @@ import { searchMoviesSchema } from '../validators/moviesValidators.js';
 
 const router = express.Router();
 
+// Multi-search (films, séries ou les deux)
+router.get('/search/multi', validateRequest(searchMoviesSchema), mediaController.searchMulti);
+
 // Search movie by name (name or q parameter)
 router.get('/search', validateRequest(searchMoviesSchema), mediaController.searchMoviesByName);
 
