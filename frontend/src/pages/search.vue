@@ -76,6 +76,31 @@
       Aucun résultat trouvé pour "{{ lastSearchQuery }}"
     </v-alert>
 
+    <!-- Dialog pour ajouter aux favoris -->
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card>
+        <v-card-title>Ajouter aux favoris</v-card-title>
+        <v-card-text>
+          <div class="mb-4">
+            <label class="text-subtitle-2 mb-2 d-block">Note (optionnel)</label>
+            <v-rating v-model="rating" color="amber" hover></v-rating>
+          </div>
+          <v-textarea
+            v-model="comment"
+            label="Commentaire (optionnel)"
+            rows="3"
+            counter="500"
+            maxlength="500"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialog = false">Annuler</v-btn>
+          <v-btn color="primary" @click="confirmAddToFavorites">Ajouter</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Snackbar for notifications -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000" location="bottom right">
       {{ snackbar.message }}
@@ -104,6 +129,10 @@ const results = ref([])
 const loading = ref(false)
 const searched = ref(false)
 const filterType = ref(route.query.type || 'all')
+const dialog = ref(false)
+const rating = ref(0)
+const comment = ref('')
+const selectedMovie = ref(null)
 
 const snackbar = ref({
   show: false,
@@ -153,20 +182,35 @@ function normalizedItem(item) {
   }
 }
 
-async function addToFavorites(movie) {
+function addToFavorites(movie) {
+  selectedMovie.value = movie
+  dialog.value = true
+}
+
+async function confirmAddToFavorites() {
   try {
-    await favoritesService.addFavorite({
-      tmdbId: movie.id,
-      type: movie.type || movie.media_type || 'movie'
-    })
+    const favoriteData = {
+      tmdbId: selectedMovie.value.id,
+      type: selectedMovie.value.type || selectedMovie.value.media_type || 'movie'
+    }
+    if (rating.value > 0) favoriteData.rating = rating.value
+    if (comment.value) favoriteData.comment = comment.value
+
+    await favoritesService.addFavorite(favoriteData)
+
+    const movieName = selectedMovie.value?.title || selectedMovie.value?.name || 'Film/Série'
+    dialog.value = false
+    rating.value = 0
+    comment.value = ''
+    selectedMovie.value = null
     snackbar.value = {
       show: true,
-      message: `${movie.title || movie.name} ajouté aux favoris !`,
+      message: `${movieName} ajouté aux favoris !`,
       color: 'success'
     }
   } catch (error) {
     console.error('Erreur lors de l\'ajout aux favoris:', error)
-    const message = error.message?.includes('existe déjà') 
+    const message = error.message?.includes('existe déjà')
       ? 'Ce contenu est déjà dans vos favoris'
       : 'Erreur lors de l\'ajout aux favoris'
     snackbar.value = {
