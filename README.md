@@ -31,6 +31,12 @@ This will:
 
 ### Other commands
 
+You can also test the code using vitest
+
+```bash
+npm run test:coverage
+```
+
 ```bash
 docker compose logs
 docker compose down 
