@@ -10,7 +10,7 @@
 ### 1. Clone and configure
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Blackyfi/Dev-Web-Enseirb.git
 cd Dev-Web-Enseirb
 ```
 
@@ -37,6 +37,8 @@ You can also test the code using vitest
 npm run test:coverage
 ```
 
+Other useful docker commands
+
 ```bash
 docker compose logs
 docker compose down 
@@ -55,6 +57,7 @@ docker compose down
 
 ## Contributors
 
+We have a authors.md file in which you have the translation Contributor to Github Username
 - Malo Andre
 - Nicolas Thongphao
 - Tim Mazzolini
