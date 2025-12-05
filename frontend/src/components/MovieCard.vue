@@ -20,9 +20,10 @@
       <!-- Badge du type (movie/tv) -->
       <v-chip
         v-if="showType && effectiveType"
-        class="ma-2"
+        class="type-badge ma-2"
         :color="effectiveType === 'movie' ? 'blue' : 'purple'"
         size="small"
+        variant="elevated"
       >
         {{ effectiveType === 'movie' ? 'Film' : 'Série' }}
       </v-chip>
@@ -64,7 +65,6 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 
@@ -83,9 +83,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['add-favorite', 'remove-favorite', 'click'])
-
-const authStore = useAuthStore()
+defineEmits(['add-favorite'])
 
 // Compute effective type from type or media_type
 const effectiveType = computed(() => {
@@ -176,5 +174,11 @@ const handleCardClick = () => {
 :deep(.v-card-actions) {
   padding: 12px 16px;
   border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.type-badge {
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 </style>

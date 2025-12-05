@@ -89,22 +89,13 @@
             
             <!-- Type Badge -->
             <v-chip
-              class="ma-2"
+              class="type-badge ma-2"
               :color="favorite.type === 'movie' ? 'blue' : 'purple'"
               size="small"
+              variant="elevated"
             >
               {{ favorite.type === 'movie' ? 'Film' : 'Série' }}
             </v-chip>
-            
-            <!-- Delete Button Overlay -->
-            <v-btn
-              class="delete-btn"
-              icon="mdi-delete"
-              color="error"
-              size="small"
-              variant="flat"
-              @click.stop="confirmDelete(favorite)"
-            />
           </v-img>
 
           <!-- Content -->
@@ -378,19 +369,14 @@ function formatDate(dateString) {
   position: relative;
 }
 
-.delete-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.favorite-card:hover .delete-btn {
-  opacity: 1;
+.type-badge {
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .gap-3 {
   gap: 12px;
 }
 </style>
+
