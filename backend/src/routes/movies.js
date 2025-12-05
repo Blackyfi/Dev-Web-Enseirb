@@ -8,4 +8,13 @@ const router = express.Router();
 // Search movie by name (name or q parameter)
 router.get('/search', validateRequest(searchMoviesSchema), mediaController.searchMoviesByName);
 
+// Get trending movies
+router.get('/trending', mediaController.getTrendingMovies);
+
+// Get popular movies
+router.get('/popular', mediaController.getPopularMovies);
+
+// Get movie details by ID (must be after /trending and /popular)
+router.get('/:id', mediaController.getMovieDetails);
+
 export default router;

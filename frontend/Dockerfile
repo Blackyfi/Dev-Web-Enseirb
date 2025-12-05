@@ -19,4 +19,5 @@ COPY . .
 RUN npm run build
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+# Utiliser --proxy pour rediriger toutes les routes vers index.html (SPA mode)
+CMD [ "http-server", "dist", "-p", "8080", "--proxy", "http://localhost:8080?" ]

@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import authRoutes from './routes/auth.js';
 import moviesRoutes from './routes/movies.js';
+import tvRoutes from './routes/tv.js';
 import favoritesRoutes from './routes/favorites.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +48,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Routes
 app.use('/auth', authRoutes);
 app.use('/movies', moviesRoutes);
+app.use('/tv', tvRoutes);
 app.use('/me', favoritesRoutes); 
 
 // Import du middleware de gestion d'erreurs personnalisé

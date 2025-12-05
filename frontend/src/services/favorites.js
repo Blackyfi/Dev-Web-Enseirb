@@ -46,9 +46,20 @@ export const findFavorite = (favorites, tmdbId) => {
   return favorites.find(fav => fav.tmdbId === tmdbId) || null
 }
 
+/**
+ * Ajouter un film/série aux favoris (helper simplifié)
+ * @param {number} tmdbId - ID TMDB du film/série
+ * @param {string} type - Type (movie ou tv)
+ * @returns {Promise<object>} Favori créé
+ */
+export const addToFavorites = async (tmdbId, type = 'movie') => {
+  return await addFavorite({ tmdbId, type })
+}
+
 export default {
   getAllFavorites,
   addFavorite,
+  addToFavorites,
   deleteFavorite,
   findFavorite,
 }

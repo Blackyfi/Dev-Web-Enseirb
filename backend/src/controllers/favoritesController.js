@@ -18,7 +18,11 @@ export async function getAllFavorites(req, res, next) {
     const enrichedFavorites = await Promise.all(
       results.map(async (favorite) => {
         try {
-          const details = await moviesService.getMovieDetails(favorite.tmdbId);
+          // Appeler la bonne fonction selon le type
+          const details = favorite.type === 'tv'
+            ? await moviesService.getTvDetails(favorite.tmdbId)
+            : await moviesService.getMovieDetails(favorite.tmdbId);
+
           return {
             ...favorite,
             title: details.title || details.name,
@@ -28,6 +32,7 @@ export async function getAllFavorites(req, res, next) {
             overview: details.overview,
             vote_average: details.vote_average,
             release_date: details.release_date || details.first_air_date,
+            first_air_date: details.first_air_date || details.release_date,
           };
         } catch (error) {
           // Si erreur TMDB, retourner juste les données de base

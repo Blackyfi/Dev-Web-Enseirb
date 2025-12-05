@@ -68,3 +68,104 @@ export async function getMovieDetails(movieId) {
 
   return data;
 }
+
+/**
+ * Obtenir les détails d'une série TV
+ * @param {number} tvId - ID TMDB de la série
+ * @returns {Promise<object>} Détails de la série
+ */
+export async function getTvDetails(tvId) {
+  const cacheKey = `tv:details:${tvId}`;
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const data = await tmdbFetch(`/tv/${tvId}`);
+
+  cacheService.set(cacheKey, data);
+
+  return data;
+}
+
+/**
+ * Obtenir les films tendances
+ * @returns {Promise<Array>} Liste des films tendances
+ */
+export async function getTrendingMovies() {
+  const cacheKey = 'movies:trending:week';
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const data = await tmdbFetch('/trending/movie/week');
+  const results = data.results || [];
+
+  // Cache pour 6 heures (les tendances changent lentement)
+  cacheService.set(cacheKey, results, 6 * 60 * 60 * 1000);
+
+  return results;
+}
+
+/**
+ * Obtenir les séries tendances
+ * @returns {Promise<Array>} Liste des séries tendances
+ */
+export async function getTrendingSeries() {
+  const cacheKey = 'tv:trending:week';
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const data = await tmdbFetch('/trending/tv/week');
+  const results = data.results || [];
+
+  cacheService.set(cacheKey, results, 6 * 60 * 60 * 1000);
+
+  return results;
+}
+
+/**
+ * Obtenir les films populaires
+ * @returns {Promise<Array>} Liste des films populaires
+ */
+export async function getPopularMovies() {
+  const cacheKey = 'movies:popular';
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const data = await tmdbFetch('/movie/popular');
+  const results = data.results || [];
+
+  cacheService.set(cacheKey, results, 6 * 60 * 60 * 1000);
+
+  return results;
+}
+
+/**
+ * Obtenir les séries populaires
+ * @returns {Promise<Array>} Liste des séries populaires
+ */
+export async function getPopularSeries() {
+  const cacheKey = 'tv:popular';
+
+  const cachedData = cacheService.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const data = await tmdbFetch('/tv/popular');
+  const results = data.results || [];
+
+  cacheService.set(cacheKey, results, 6 * 60 * 60 * 1000);
+
+  return results;
+}

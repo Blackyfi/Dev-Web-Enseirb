@@ -76,5 +76,15 @@ export default defineConfig({
   },
   server: {
     port: 9080,
+    // Fallback to index.html for SPA routing
+    historyApiFallback: true,
+  },
+  // Ensure proper routing for production build
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 })
