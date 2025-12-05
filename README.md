@@ -37,6 +37,8 @@ You can also test the code using vitest
 npm run test:coverage
 ```
 
+Other useful docker commands
+
 ```bash
 docker compose logs
 docker compose down 
