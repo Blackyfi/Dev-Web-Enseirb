@@ -233,11 +233,11 @@ const snackbar = ref({
 })
 
 const sortOptions = [
-  { title: 'Plus récents', value: 'date-desc' },
-  { title: 'Plus anciens', value: 'date-asc' },
-  { title: 'Meilleure note', value: 'rating-desc' },
-  { title: 'Note TMDB', value: 'vote-desc' },
-  { title: 'Titre (A-Z)', value: 'title-asc' }
+  { title: 'Plus récemment ajouté - DESC', value: 'date-desc' },
+  { title: 'Plus anciennement ajouté - ASC', value: 'date-asc' },
+  { title: 'Meilleure note - DESC', value: 'rating-desc' },
+  { title: 'Note TMDB - DESC', value: 'vote-desc' },
+  { title: 'Titre (A->Z) - ASC', value: 'title-asc' }
 ]
 
 const filteredFavorites = computed(() => {
