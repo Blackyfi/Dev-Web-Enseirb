@@ -89,7 +89,7 @@
               color="primary"
               size="large"
               prepend-icon="mdi-heart-plus"
-              @click="dialog = true"
+              @click="addToFavorites"
               :disabled="loading"
             >
               Ajouter aux favoris
@@ -162,46 +162,11 @@
       </v-col>
     </v-row>
 
-<<<<<<< HEAD:frontend/src/components/media/MovieDetail.vue
     <AppSnackbar
       v-model="snackbar.show"
       :message="snackbar.message"
       :color="snackbar.color"
     />
-=======
-    <!-- Dialog pour ajouter aux favoris -->
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card>
-        <v-card-title>Ajouter aux favoris</v-card-title>
-        <v-card-text>
-          <div class="mb-4">
-            <label class="text-subtitle-2 mb-2 d-block">Note (optionnel)</label>
-            <v-rating v-model="rating" color="amber" hover></v-rating>
-          </div>
-          <v-textarea
-            v-model="comment"
-            label="Commentaire (optionnel)"
-            rows="3"
-            counter="500"
-            maxlength="500"
-          ></v-textarea>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="dialog = false">Annuler</v-btn>
-          <v-btn color="primary" @click="addToFavorites">Ajouter</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Snackbar for feedback -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-      {{ snackbar.message }}
-      <template v-slot:actions>
-        <v-btn variant="text" @click="snackbar.show = false">Fermer</v-btn>
-      </template>
-    </v-snackbar>
->>>>>>> bcb45232621b0e6c477d1cd5082f42062193ccd6:frontend/src/pages/movie/[id].vue
   </v-container>
 
   <v-container v-else-if="loading" class="text-center">
@@ -226,22 +191,9 @@ import AppSnackbar from "@/components/ui/AppSnackbar.vue";
 const route = useRoute();
 const router = useRouter();
 
-<<<<<<< HEAD:frontend/src/components/media/MovieDetail.vue
 const movie = ref(null);
 const loading = ref(true);
 const snackbar = ref({ show: false, message: "", color: "success" });
-=======
-const movie = ref(null)
-const loading = ref(true)
-const dialog = ref(false)
-const rating = ref(0)
-const comment = ref('')
-const snackbar = ref({
-  show: false,
-  message: '',
-  color: 'success'
-})
->>>>>>> bcb45232621b0e6c477d1cd5082f42062193ccd6:frontend/src/pages/movie/[id].vue
 
 const imageUrl = computed(() =>
   movie.value?.poster_path
@@ -277,26 +229,11 @@ function goBack() {
 
 async function addToFavorites() {
   try {
-<<<<<<< HEAD:frontend/src/components/media/MovieDetail.vue
     loading.value = true;
     await addFavorite({
       tmdbId: movie.value.id,
       type: movie.value.type || "movie",
     });
-=======
-    loading.value = true
-    const favoriteData = {
-      tmdbId: movie.value.id,
-      type: movie.value.type || 'movie'
-    }
-    if (rating.value > 0) favoriteData.rating = rating.value
-    if (comment.value) favoriteData.comment = comment.value
-
-    await addFavorite(favoriteData)
-    dialog.value = false
-    rating.value = 0
-    comment.value = ''
->>>>>>> bcb45232621b0e6c477d1cd5082f42062193ccd6:frontend/src/pages/movie/[id].vue
     snackbar.value = {
       show: true,
       message: "Ajouté aux favoris avec succès!",

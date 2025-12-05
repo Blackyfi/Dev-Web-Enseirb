@@ -112,3 +112,42 @@ export async function deleteFavorite(req, res, next) {
     next(error);
   }
 }
+
+/**
+ * Update a favorite (rating and comment)
+ */
+export async function updateFavorite(req, res, next) {
+  try {
+    const userId = req.user.id;
+    if (!userId) throw new UnauthorizedError('Need to be logged in');
+
+    const favoriteId = req.params.id;
+    const { rating, comment } = req.body;
+
+    // Check if favorite belongs to user
+    const checkQuery = 'SELECT id FROM favorites WHERE id = ? AND user_id = ?';
+    const [checkResults] = await db.execute(checkQuery, [favoriteId, userId]);
+
+    if (!checkResults || checkResults.length === 0) {
+      throw new NotFoundError('Favori non trouvé ou non autorisé');
+    }
+
+    // Validate rating (1-5 or null)
+    if (rating !== null && rating !== undefined && (rating < 1 || rating > 5)) {
+      throw new Error('La note doit être entre 1 et 5');
+    }
+
+    // Update favorite
+    const updateQuery = 'UPDATE favorites SET rating = ?, comment = ? WHERE id = ? AND user_id = ?';
+    await db.execute(updateQuery, [rating || null, comment || null, favoriteId, userId]);
+
+    return res.status(200).json({
+      id: parseInt(favoriteId),
+      rating: rating || null,
+      comment: comment || null,
+      message: 'Favori mis à jour avec succès'
+    });
+  } catch (error) {
+    next(error);
+  }
+}

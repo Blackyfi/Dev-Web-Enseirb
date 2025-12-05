@@ -63,26 +63,31 @@
       </p>
     </v-card-text>
 
-    <v-card-actions class="pt-0">
+    <v-card-actions class="pt-0 flex-wrap justify-center ga-1">
       <v-btn
         color="error"
         variant="text"
-        size="small"
-        prepend-icon="mdi-heart-remove"
+        size="x-small"
+        prepend-icon="mdi-delete"
         @click="$emit('delete')"
+        >Retirer</v-btn
       >
-        Retirer
-      </v-btn>
-      <v-spacer />
+      <v-btn
+        color="warning"
+        variant="text"
+        size="x-small"
+        prepend-icon="mdi-star"
+        @click="$emit('edit')"
+        >Noter</v-btn
+      >
       <v-btn
         color="primary"
         variant="text"
-        size="small"
+        size="x-small"
         prepend-icon="mdi-eye"
         @click="$emit('click')"
+        >Détails</v-btn
       >
-        Détails
-      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -94,7 +99,7 @@ const props = defineProps({
   favorite: { type: Object, required: true },
 });
 
-defineEmits(["click", "delete"]);
+defineEmits(["click", "delete", "edit"]);
 
 const imageUrl = computed(() => {
   if (!props.favorite.poster_path) return "";

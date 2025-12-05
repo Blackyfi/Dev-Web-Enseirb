@@ -25,4 +25,12 @@ export const deleteFavorite = async (favoriteId) => {
   await api.delete(`/me/favorites/${favoriteId}`)
 }
 
-export default { getAllFavorites, addFavorite, deleteFavorite }
+/**
+ * Mettre à jour un favori (rating et comment)
+ */
+export const updateFavorite = async (favoriteId, data) => {
+  return await api.put(`/me/favorites/${favoriteId}`, data)
+}
+
+export default { getAllFavorites, addFavorite, deleteFavorite, updateFavorite }
+

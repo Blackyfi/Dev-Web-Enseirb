@@ -68,6 +68,7 @@
           :favorite="favorite"
           @click="goToDetails(favorite)"
           @delete="confirmDelete(favorite)"
+          @edit="openEditDialog(favorite)"
         />
       </v-col>
     </v-row>
@@ -125,6 +126,50 @@
       </v-card>
     </v-dialog>
 
+    <!-- Edit Rating/Comment Dialog -->
+    <v-dialog v-model="editDialog" max-width="500">
+      <v-card>
+        <v-card-title class="text-h6">
+          <v-icon color="warning" class="mr-2">mdi-pencil</v-icon>
+          Noter {{ favoriteToEdit?.title || favoriteToEdit?.name }}
+        </v-card-title>
+        <v-card-text>
+          <div class="mb-4">
+            <label class="text-subtitle-2 mb-2 d-block"
+              >Ma note (1-5 étoiles)</label
+            >
+            <v-rating
+              v-model="editRating"
+              color="amber"
+              hover
+              length="5"
+              size="large"
+            />
+          </div>
+          <v-textarea
+            v-model="editComment"
+            label="Mon commentaire (optionnel)"
+            rows="3"
+            counter="500"
+            maxlength="500"
+            variant="outlined"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-btn variant="text" @click="clearRating">Effacer</v-btn>
+          <v-spacer />
+          <v-btn variant="text" @click="editDialog = false">Annuler</v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            @click="saveEdit"
+            :loading="saving"
+            >Enregistrer</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <AppSnackbar
       v-model="snackbar.show"
       :message="snackbar.message"
@@ -150,6 +195,13 @@ const sortBy = ref("date-desc");
 const deleteDialog = ref(false);
 const favoriteToDelete = ref(null);
 const snackbar = ref({ show: false, message: "", color: "success" });
+
+// Edit dialog state
+const editDialog = ref(false);
+const favoriteToEdit = ref(null);
+const editRating = ref(0);
+const editComment = ref("");
+const saving = ref(false);
 
 const sortOptions = [
   { title: "Plus récents", value: "date-desc" },
@@ -241,6 +293,53 @@ function goToDetails(favorite) {
     path: `/media/${favorite.tmdbId || favorite.id}`,
     query: { type: favorite.type || "movie" },
   });
+}
+
+// Edit functions
+function openEditDialog(favorite) {
+  favoriteToEdit.value = favorite;
+  editRating.value = favorite.rating || 0;
+  editComment.value = favorite.comment || "";
+  editDialog.value = true;
+}
+
+function clearRating() {
+  editRating.value = 0;
+  editComment.value = "";
+}
+
+async function saveEdit() {
+  if (!favoriteToEdit.value) return;
+  saving.value = true;
+  try {
+    await favoritesService.updateFavorite(favoriteToEdit.value.id, {
+      rating: editRating.value || null,
+      comment: editComment.value || null,
+    });
+    // Update local state
+    const index = favorites.value.findIndex(
+      (f) => f.id === favoriteToEdit.value.id
+    );
+    if (index !== -1) {
+      favorites.value[index].rating = editRating.value || null;
+      favorites.value[index].comment = editComment.value || null;
+    }
+    snackbar.value = {
+      show: true,
+      message: "Note enregistrée avec succès",
+      color: "success",
+    };
+    editDialog.value = false;
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      message: "Erreur lors de la sauvegarde",
+      color: "error",
+    };
+  } finally {
+    saving.value = false;
+    favoriteToEdit.value = null;
+  }
 }
 </script>
 
