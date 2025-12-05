@@ -98,7 +98,7 @@
               color="primary"
               size="large"
               prepend-icon="mdi-heart-plus"
-              @click="addToFavorites"
+              @click="dialog = true"
               :disabled="loading"
             >
               Ajouter aux favoris
@@ -164,6 +164,31 @@
       </v-col>
     </v-row>
 
+    <!-- Dialog pour ajouter aux favoris -->
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card>
+        <v-card-title>Ajouter aux favoris</v-card-title>
+        <v-card-text>
+          <div class="mb-4">
+            <label class="text-subtitle-2 mb-2 d-block">Note (optionnel)</label>
+            <v-rating v-model="rating" color="amber" hover></v-rating>
+          </div>
+          <v-textarea
+            v-model="comment"
+            label="Commentaire (optionnel)"
+            rows="3"
+            counter="500"
+            maxlength="500"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="dialog = false">Annuler</v-btn>
+          <v-btn color="primary" @click="addToFavorites">Ajouter</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Snackbar for feedback -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
       {{ snackbar.message }}
@@ -196,6 +221,9 @@ const router = useRouter()
 
 const movie = ref(null)
 const loading = ref(true)
+const dialog = ref(false)
+const rating = ref(0)
+const comment = ref('')
 const snackbar = ref({
   show: false,
   message: '',
@@ -239,7 +267,17 @@ const goBack = () => {
 const addToFavorites = async () => {
   try {
     loading.value = true
-    await addFavorite(movie.value.id, movie.value.type || 'movie')
+    const favoriteData = {
+      tmdbId: movie.value.id,
+      type: movie.value.type || 'movie'
+    }
+    if (rating.value > 0) favoriteData.rating = rating.value
+    if (comment.value) favoriteData.comment = comment.value
+
+    await addFavorite(favoriteData)
+    dialog.value = false
+    rating.value = 0
+    comment.value = ''
     snackbar.value = {
       show: true,
       message: 'Ajouté aux favoris avec succès!',
